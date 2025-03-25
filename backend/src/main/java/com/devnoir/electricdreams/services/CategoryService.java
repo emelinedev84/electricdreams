@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.devnoir.electricdreams.dto.CategoryDTO;
 import com.devnoir.electricdreams.entities.Category;
 import com.devnoir.electricdreams.repositories.CategoryRepository;
+import com.devnoir.electricdreams.services.exceptions.EntityNotFoundException;
 
 @Service
 public class CategoryService {
@@ -24,7 +25,17 @@ public class CategoryService {
 		return list.stream().map(x -> new CategoryDTO(x)).collect(Collectors.toList());
 	}
 	
-	public Optional<Category> findById(Long id) {
-		return categoryRepository.findById(id);
+	@Transactional(readOnly = true)
+	public CategoryDTO findById(Long id) {
+		Optional<Category> category = categoryRepository.findById(id);
+		Category entity = category.orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+		return new CategoryDTO(entity);
+	}
+	
+	public CategoryDTO insert(CategoryDTO dto) {
+		Category entity = new Category();
+		entity.setName(dto.getName());
+		entity = categoryRepository.save(entity);
+		return new CategoryDTO(entity);
 	}
 }
