@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.devnoir.electricdreams.dto.CategoryDTO;
@@ -57,11 +58,13 @@ public class CategoryService {
 		}
 	}
 	
+	@Transactional(propagation = Propagation.SUPPORTS)
 	public void delete(Long id) {
+		if (!categoryRepository.existsById(id)) {
+			throw new ResourceNotFoundException("Id not found: " + id);
+		}
 		try {
 			categoryRepository.deleteById(id);
-		} catch (EmptyResultDataAccessException e) {
-			throw new ResourceNotFoundException("Id not found: " + id);
 		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Integrity violation");
 		}
