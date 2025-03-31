@@ -1,43 +1,35 @@
 package com.devnoir.electricdreams.entities;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tb_category")
-public class Category implements Serializable {
+@Table(name = "tb_tag")
+public class Tag implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
-	@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
-	private Instant createdAt;
-	@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
-	private Instant updatedAt;
 	
-	@ManyToMany(mappedBy = "categories")
+	@ManyToMany(mappedBy = "tags")
 	private Set<Post> posts = new HashSet<>();
 	
-	public Category() {
+	public Tag() {
 	}
-	
-	public Category(Long id, String name) {
+
+	public Tag(Long id, String name) {
 		this.id = id;
 		this.name = name;
 	}
@@ -58,24 +50,10 @@ public class Category implements Serializable {
 		this.name = name;
 	}
 
-	public Instant getCreatedAt() {
-		return createdAt;
+	public Set<Post> getPosts() {
+		return posts;
 	}
 
-	public Instant getUpdatedAt() {
-		return updatedAt;
-	}
-
-	@PrePersist
-	public void prePersist() {
-		createdAt = Instant.now();
-	}
-
-	@PreUpdate
-	public void preUpdate() {
-		updatedAt = Instant.now();
-	}
-	
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
@@ -89,7 +67,7 @@ public class Category implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Category other = (Category) obj;
+		Tag other = (Tag) obj;
 		return Objects.equals(id, other.id);
 	}
 }
