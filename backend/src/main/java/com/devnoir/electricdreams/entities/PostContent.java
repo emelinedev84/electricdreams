@@ -1,7 +1,9 @@
 package com.devnoir.electricdreams.entities;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import com.devnoir.electricdreams.enums.Language;
 
@@ -9,10 +11,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -42,6 +47,14 @@ public class PostContent implements Serializable {
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
 	private Post post;
+    
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "tb_content_tag", joinColumns = @JoinColumn(name = "content_id"), inverseJoinColumns = @JoinColumn(name = "tag_id")) 
+	private Set<Tag> tags = new HashSet<>();
+	
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "tb_content_category", joinColumns = @JoinColumn(name = "content_id"), inverseJoinColumns = @JoinColumn(name = "category_id")) 
+	private Set<Category> categories = new HashSet<>();
     
     public PostContent() {
     }
@@ -120,6 +133,14 @@ public class PostContent implements Serializable {
 
 	public void setPost(Post post) {
 		this.post = post;
+	}
+	
+	public Set<Tag> getTags() {
+		return tags;
+	}
+
+	public Set<Category> getCategories() {
+		return categories;
 	}
 
 	@Override

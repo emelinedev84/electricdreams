@@ -13,8 +13,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
@@ -40,16 +38,8 @@ public class Post implements Serializable {
 	@JoinColumn(name = "user_id")
 	private User author;
 	
-	@ManyToMany
-	@JoinTable(name = "tb_post_tag", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "tag_id")) 
-	private Set<Tag> tags = new HashSet<>();
-	
-	@ManyToMany
-	@JoinTable(name = "tb_post_category", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "category_id")) 
-	private Set<Category> categories = new HashSet<>();
-	
 	@OneToMany(mappedBy = "post")
-	private Set<Comment> comments = new HashSet<>();
+	private Set<PostContent> contents = new HashSet<>();
 	
 	public Post() {
 	}
@@ -101,17 +91,9 @@ public class Post implements Serializable {
 	public void setAuthor(User author) {
 		this.author = author;
 	}
-	
-	public Set<Tag> getTags() {
-		return tags;
-	}
 
-	public Set<Category> getCategories() {
-		return categories;
-	}
-
-	public Set<Comment> getComments() {
-		return comments;
+	public Set<PostContent> getContents() {
+		return contents;
 	}
 
 	@PrePersist

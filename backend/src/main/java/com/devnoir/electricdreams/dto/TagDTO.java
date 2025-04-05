@@ -1,26 +1,30 @@
 package com.devnoir.electricdreams.dto;
 
-import com.devnoir.electricdreams.entities.Category;
+import java.io.Serializable;
 
-public class CategoryDTO {
+import com.devnoir.electricdreams.entities.Tag;
+
+public class TagDTO implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private Long id;
 	private String name;
 	private String language;
 	
-	public CategoryDTO() {
+	public TagDTO() {
 	}
-	
-	public CategoryDTO(Long id, String name, String language) {
+
+	public TagDTO(Long id, String name, String language) {
 		this.id = id;
 		this.name = name;
 		this.language = language;
 	}
 
-	public CategoryDTO(Category category) {
-		id = category.getId();
-		name = category.getName();
-		language = category.getLanguage().name();
+	public TagDTO(Tag tag) {
+		id = tag.getId();
+		name = tag.getName();
+		language = tag.getLanguage().name();
 	}
 
 	public Long getId() {

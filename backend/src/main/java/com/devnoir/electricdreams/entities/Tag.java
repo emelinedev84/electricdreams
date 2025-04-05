@@ -5,7 +5,12 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.devnoir.electricdreams.enums.Language;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,8 +28,12 @@ public class Tag implements Serializable {
 	private Long id;
 	private String name;
 	
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+	private Language language;
+	
 	@ManyToMany(mappedBy = "tags")
-	private Set<Post> posts = new HashSet<>();
+	private Set<PostContent> contents = new HashSet<>();
 	
 	public Tag() {
 	}
@@ -50,8 +59,16 @@ public class Tag implements Serializable {
 		this.name = name;
 	}
 
-	public Set<Post> getPosts() {
-		return posts;
+	public Language getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(Language language) {
+		this.language = language;
+	}
+
+	public Set<PostContent> getContents() {
+		return contents;
 	}
 
 	@Override
