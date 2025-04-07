@@ -16,45 +16,46 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.devnoir.electricdreams.dto.UserDTO;
-import com.devnoir.electricdreams.dto.UserInsertDTO;
-import com.devnoir.electricdreams.services.UserService;
+import com.devnoir.electricdreams.dto.CategoryDTO;
+import com.devnoir.electricdreams.services.AdminCategoryService;
 
 @RestController
-@RequestMapping(value = "/users")
-public class UserResource {
+@RequestMapping(value = "/admin/categories")
+public class AdminCategoryResource {
 
 	@Autowired
-	public UserService userService;
+	public AdminCategoryService adminCategoryService;
 	
 	@GetMapping
-	public ResponseEntity<Page<UserDTO>> findAll(Pageable pageable) {
-		Page<UserDTO> page = userService.findAllPaged(pageable);
+	public ResponseEntity<Page<CategoryDTO>> findAll(Pageable pageable) {
+		Page<CategoryDTO> page = adminCategoryService.findAllPaged(pageable);
 		return ResponseEntity.ok().body(page);
 	}
 	
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
-		UserDTO dto = userService.findById(id);
+	public ResponseEntity<CategoryDTO> findById(@PathVariable Long id) {
+		CategoryDTO dto = adminCategoryService.findById(id);
 		return ResponseEntity.ok().body(dto);
 	}
 	
 	@PostMapping
-	public ResponseEntity<UserDTO> insert(@RequestBody UserInsertDTO dto) {
-		UserDTO newDto = userService.insert(dto);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newDto.getId()).toUri();
-		return ResponseEntity.created(uri).body(newDto);
+	public ResponseEntity<CategoryDTO> insert(@RequestBody CategoryDTO dto) {
+		dto = adminCategoryService.insert(dto);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
+		return ResponseEntity.created(uri).body(dto);
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO userDto) {
-		UserDTO dto = userService.update(id, userDto);
+	public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @RequestBody CategoryDTO categoryDto) {
+		CategoryDTO dto = new CategoryDTO();
+		dto.setName(categoryDto.getName());
+		dto = adminCategoryService.update(id, dto);
 		return ResponseEntity.ok().body(dto);
 	}
 	
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
-		userService.delete(id);
+		adminCategoryService.delete(id);
 		return ResponseEntity.noContent().build();
 	}
 }

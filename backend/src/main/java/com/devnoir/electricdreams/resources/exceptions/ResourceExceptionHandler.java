@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.devnoir.electricdreams.services.exceptions.BusinessException;
 import com.devnoir.electricdreams.services.exceptions.DatabaseException;
 import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
 
@@ -25,5 +26,11 @@ public class ResourceExceptionHandler {
 	public ResponseEntity<StandardError> database(DatabaseException e, HttpServletRequest request) {
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		return ResponseEntity.status(status).body(new StandardError(Instant.now(), status.value(), "Database exception", e.getMessage(), request.getRequestURI()));
+	}
+	
+	@ExceptionHandler(BusinessException.class)
+	public ResponseEntity<StandardError> business(BusinessException e, HttpServletRequest request) {
+		HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+		return ResponseEntity.status(status).body(new StandardError(Instant.now(), status.value(), "Business rule violation", e.getMessage(), request.getRequestURI()));
 	}
 }

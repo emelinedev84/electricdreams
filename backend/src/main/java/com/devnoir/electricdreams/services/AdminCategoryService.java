@@ -12,14 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.devnoir.electricdreams.dto.CategoryDTO;
 import com.devnoir.electricdreams.entities.Category;
+import com.devnoir.electricdreams.enums.Language;
 import com.devnoir.electricdreams.repositories.CategoryRepository;
+import com.devnoir.electricdreams.services.exceptions.BusinessException;
 import com.devnoir.electricdreams.services.exceptions.DatabaseException;
 import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class CategoryService {
+public class AdminCategoryService {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
@@ -39,10 +41,15 @@ public class CategoryService {
 	
 	@Transactional
 	public CategoryDTO insert(CategoryDTO dto) {
-		Category category = new Category();
-		category.setName(dto.getName());
-		category = categoryRepository.save(category);
-		return new CategoryDTO(category);
+		try {
+			Category category = new Category();
+			category.setName(dto.getName());
+			category.setLanguage(Language.valueOf(dto.getLanguage()));
+			category = categoryRepository.save(category);
+			return new CategoryDTO(category);
+	    } catch (IllegalArgumentException e) {
+	        throw new BusinessException("Invalid language: " + dto.getLanguage());
+	    }
 	}
 	
 	@Transactional

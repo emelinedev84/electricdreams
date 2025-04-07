@@ -5,41 +5,36 @@ import java.io.Serializable;
 import com.devnoir.electricdreams.entities.Post;
 import com.devnoir.electricdreams.enums.Language;
 
-public class PostEditDTO implements Serializable {
+public class PostCreateDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Long id;
+	private Long authorId;
 	private String imageUrl;
 	private PostContentDTO en;
 	private PostContentDTO pt;
 	
-	public PostEditDTO() {
+	public PostCreateDTO() {
 	}
 
-	public PostEditDTO(Long id, String imageUrl) {
-		this.id = id;
+	public PostCreateDTO(Long authorId, String imageUrl) {
+		this.authorId = authorId;
 		this.imageUrl = imageUrl;
 	}
 	
-	public PostEditDTO(Post post) {
-		id = post.getId();
+	public PostCreateDTO(Post post) {
+		authorId = post.getAuthor().getId();
 		imageUrl = post.getImageUrl();
-		post.getContents().forEach(content -> {
-            if (content.getLanguage() == Language.EN) {
-                this.en = new PostContentDTO(content);
-            } else if (content.getLanguage() == Language.PT) {
-                this.pt = new PostContentDTO(content);
-            }
-        });
+	    en = post.getContents().stream().filter(content -> content.getLanguage() == Language.EN).findFirst().map(x -> new PostContentDTO(x)).orElse(null);
+	    pt = post.getContents().stream().filter(content -> content.getLanguage() == Language.PT).findFirst().map(x -> new PostContentDTO(x)).orElse(null);
 	}
 
-	public Long getId() {
-		return id;
+	public Long getAuthorId() {
+		return authorId;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setAuthorId(Long authorId) {
+		this.authorId = authorId;
 	}
 
 	public String getImageUrl() {

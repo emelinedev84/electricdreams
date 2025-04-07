@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.devnoir.electricdreams.dto.RoleDTO;
 import com.devnoir.electricdreams.dto.UserDTO;
-import com.devnoir.electricdreams.dto.UserInsertDTO;
+import com.devnoir.electricdreams.dto.UserCreateDTO;
 import com.devnoir.electricdreams.entities.Role;
 import com.devnoir.electricdreams.entities.User;
 import com.devnoir.electricdreams.repositories.RoleRepository;
@@ -24,7 +24,7 @@ import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class UserService {
+public class AdminUserService {
 
 	@Autowired
  	private UserRepository userRepository;
@@ -49,7 +49,7 @@ public class UserService {
  	}
  	
  	@Transactional
- 	public UserDTO insert(UserInsertDTO dto) {
+ 	public UserDTO insert(UserCreateDTO dto) {
  		User user = new User();
  		copyDtoToEntity(dto, user);
  		user.setPassword(passwordEncoder.encode(dto.getPassword()));

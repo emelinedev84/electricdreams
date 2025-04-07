@@ -145,7 +145,7 @@ public class PostContent implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id);
+		return Objects.hash(id, language);
 	}
 
 	@Override
@@ -157,8 +157,6 @@ public class PostContent implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PostContent other = (PostContent) obj;
-		return Objects.equals(id, other.id);
+		return Objects.equals(id, other.id) && language == other.language;
 	}
-    
-    
 }

@@ -1,12 +1,12 @@
 package com.devnoir.electricdreams.dto;
 
-public class UserInsertDTO extends UserDTO {
+public class UserCreateDTO extends UserDTO {
 
 	private static final long serialVersionUID = 1L;
 	
 	private String password;
 	
-	public UserInsertDTO() {
+	public UserCreateDTO() {
 		super();
 	}
 

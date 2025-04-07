@@ -2,6 +2,11 @@ package com.devnoir.electricdreams.dto;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.devnoir.electricdreams.entities.Post;
+import com.devnoir.electricdreams.enums.Language;
 
 public class PostDTO implements Serializable {
 
@@ -13,6 +18,8 @@ public class PostDTO implements Serializable {
 	private Instant updatedAt;
 	private Long authorId;
 	
+	private List<PostContentDTO> contents = new ArrayList<>();
+	
 	public PostDTO() {
 	}
 
@@ -22,6 +29,26 @@ public class PostDTO implements Serializable {
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 		this.authorId = authorId;
+	}
+	
+	public PostDTO(Post post) {
+		id = post.getId();
+		imageUrl = post.getImageUrl();
+		createdAt = post.getCreatedAt();
+		updatedAt = post.getUpdatedAt();
+		authorId = post.getAuthor().getId();
+		post.getContents().forEach(content -> contents.add(new PostContentDTO(content)));
+	}
+	
+	public PostDTO(Post post, Language language) {
+	    id = post.getId();
+	    imageUrl = post.getImageUrl();
+	    createdAt = post.getCreatedAt();
+	    updatedAt = post.getUpdatedAt();
+	    authorId = post.getAuthor().getId();
+	    post.getContents().stream()
+	        .filter(content -> content.getLanguage() == language)
+	        .forEach(content -> contents.add(new PostContentDTO(content)));
 	}
 
 	public Long getId() {
@@ -62,5 +89,9 @@ public class PostDTO implements Serializable {
 
 	public void setAuthorId(Long authorId) {
 		this.authorId = authorId;
-	}	
+	}
+
+	public List<PostContentDTO> getContents() {
+		return contents;
+	}
 }

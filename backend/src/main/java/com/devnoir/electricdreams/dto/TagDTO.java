@@ -11,6 +11,7 @@ public class TagDTO implements Serializable {
 	private Long id;
 	private String name;
 	private String language;
+	private boolean isNew;
 	
 	public TagDTO() {
 	}
@@ -19,12 +20,14 @@ public class TagDTO implements Serializable {
 		this.id = id;
 		this.name = name;
 		this.language = language;
+		this.isNew = false;
 	}
 
 	public TagDTO(Tag tag) {
 		id = tag.getId();
 		name = tag.getName();
 		language = tag.getLanguage().name();
+		this.isNew = false;
 	}
 
 	public Long getId() {
@@ -49,5 +52,13 @@ public class TagDTO implements Serializable {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public boolean isNew() {
+		return isNew;
+	}
+
+	public void setNew(boolean isNew) {
+		this.isNew = isNew;
 	}
 }

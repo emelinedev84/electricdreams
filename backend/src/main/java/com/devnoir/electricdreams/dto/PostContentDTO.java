@@ -16,8 +16,8 @@ public class PostContentDTO implements Serializable {
 	private String title;
 	private String content;
 	private String metaDescription;
-	private Boolean isDraft;
 	private Long postId;
+	private Boolean isDraft;
     
 	private Set<TagDTO> tags = new HashSet<>();
 	private Set<CategoryDTO> categories = new HashSet<>();
@@ -39,7 +39,7 @@ public class PostContentDTO implements Serializable {
 
 	public PostContentDTO(PostContent postContent) {
 		id = postContent.getId();
-		language = postContent.getLanguage().name();
+		language = postContent.getLanguage() != null ? postContent.getLanguage().name() : null;
 		urlHandle = postContent.getUrlHandle();
 		title = postContent.getTitle();
 		content = postContent.getContent();
@@ -92,12 +92,6 @@ public class PostContentDTO implements Serializable {
 	public void setIsDraft(Boolean isDraft) {
 		this.isDraft = isDraft;
 	}
-	public Long getPostId() {
-		return postId;
-	}
-	public void setPostId(Long postId) {
-		this.postId = postId;
-	}
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -106,5 +100,11 @@ public class PostContentDTO implements Serializable {
 	}
 	public Set<CategoryDTO> getCategories() {
 		return categories;
+	}
+	public Long getPostId() {
+		return postId;
+	}
+	public void setPostId(Long postId) {
+		this.postId = postId;
 	}
 }

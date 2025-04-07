@@ -2,10 +2,11 @@ package com.devnoir.electricdreams.entities;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -38,8 +39,8 @@ public class Post implements Serializable {
 	@JoinColumn(name = "user_id")
 	private User author;
 	
-	@OneToMany(mappedBy = "post")
-	private Set<PostContent> contents = new HashSet<>();
+	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PostContent> contents = new ArrayList<>();
 	
 	public Post() {
 	}
@@ -92,13 +93,14 @@ public class Post implements Serializable {
 		this.author = author;
 	}
 
-	public Set<PostContent> getContents() {
+	public List<PostContent> getContents() {
 		return contents;
 	}
 
 	@PrePersist
 	public void prePersist() {
 		createdAt = Instant.now();
+		updatedAt = null;
 	}
 
 	@PreUpdate
