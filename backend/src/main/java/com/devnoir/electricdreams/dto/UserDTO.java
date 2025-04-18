@@ -15,18 +15,22 @@ public class UserDTO implements Serializable {
 	private String firstName;
 	private String lastName;
 	private String email;
+	private String bio;
+	private String imageUrl;
 	
 	Set<RoleDTO> roles = new HashSet<>();
 	
 	public UserDTO() {
 	}
 
-	public UserDTO(Long id, String username, String firstName, String lastName, String email) {
+	public UserDTO(Long id, String username, String firstName, String lastName, String email, String bio, String imageUrl) {
 		this.id = id;
 		this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
+		this.bio = bio;
+		this.imageUrl = imageUrl;
 	}
 	
 	public UserDTO(User user) {
@@ -35,6 +39,8 @@ public class UserDTO implements Serializable {
 		firstName = user.getFirstName();
 		lastName = user.getLastName();
 		email = user.getEmail();
+		bio = user.getBio();
+		imageUrl = user.getImageUrl();
 		user.getRoles().forEach(x -> this.roles.add(new RoleDTO(x)));
 	}
 
@@ -76,6 +82,22 @@ public class UserDTO implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getBio() {
+		return bio;
+	}
+
+	public void setBio(String bio) {
+		this.bio = bio;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 	public Set<RoleDTO> getRoles() {

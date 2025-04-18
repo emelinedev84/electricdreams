@@ -1,5 +1,9 @@
 package com.devnoir.electricdreams.services;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -24,6 +28,7 @@ import com.devnoir.electricdreams.repositories.CategoryRepository;
 import com.devnoir.electricdreams.repositories.PostRepository;
 import com.devnoir.electricdreams.repositories.TagRepository;
 import com.devnoir.electricdreams.repositories.UserRepository;
+import com.devnoir.electricdreams.services.exceptions.BusinessException;
 import com.devnoir.electricdreams.services.exceptions.DatabaseException;
 import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
 
@@ -50,16 +55,19 @@ public class AdminPostService {
  	
  	@Transactional(readOnly = true) 
  	public PostDTO findById(Long id) {
- 		Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post not found")); 
- 		return new PostDTO(post);
+ 	    Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post not found")); 
+ 	    
+ 	    return new PostDTO(post);
  	}
  	
  	@Transactional
  	public PostDTO create(PostCreateDTO dto) {
- 		validateCreateDTO(dto);
- 		
- 		Post post = createOrUpdatePostBasicInfo(new Post(), dto);
- 		return new PostDTO(post);
+ 	    validateCreateDTO(dto);
+ 	    
+ 	    Post post = new Post();
+ 	    post = postRepository.save(post); // Salvar primeiro para ter o ID
+ 	    post = createOrUpdatePostBasicInfo(post, dto);
+ 	    return new PostDTO(post);
  	}
  	
  	@Transactional
@@ -105,16 +113,27 @@ public class AdminPostService {
 	}
  	
  	private void validateCreateDTO(PostCreateDTO dto) {
- 		if (dto.getEn() == null && dto.getPt() == null) {
- 			throw new IllegalArgumentException("Post must have content in at least one language");
- 		}
+ 		if (dto.getAuthorId() == null) {
+ 	        throw new BusinessException("Author ID must not be null");
+ 	    }
+
+ 	    if (dto.getEn() == null && dto.getPt() == null) {
+ 	        throw new BusinessException("Post must have content in at least one language");
+ 	    }
  	}
  	
     private Post createOrUpdatePostBasicInfo(Post post, PostCreateDTO dto) {
+    	// Primeiro instanciar o post se for null
+        if (post == null) {
+            post = new Post();
+        }
+        
+        // Depois setar as informações básicas
         post.setImageUrl(dto.getImageUrl());
         User user = userRepository.getReferenceById(dto.getAuthorId());
         post.setAuthor(user);
         
+        // Por fim atualizar o conteúdo
         if (dto.getEn() != null) {
             updateOrCreateContent(post, dto.getEn(), Language.EN);
         }
@@ -126,7 +145,19 @@ public class AdminPostService {
     }
  	
  	private void updateOrCreateContent(Post post, PostContentDTO contentDto, Language language) {
- 		PostContent content = post.getContents().stream().filter(c -> c.getLanguage() == language).findFirst().orElse(new PostContent());
+ 	// Primeiro verifica se já existe conteúdo para este idioma
+ 	    boolean hasExistingContent = post.getContents().stream()
+ 	            .anyMatch(c -> c.getLanguage() == language);
+ 	            
+ 	    // Se estamos criando um novo conteúdo (não atualizando) e já existe um para este idioma
+ 	    PostContent content = post.getContents().stream()
+ 	            .filter(c -> c.getLanguage() == language)
+ 	            .findFirst()
+ 	            .orElse(new PostContent());
+ 	            
+ 	    if (hasExistingContent && content.getId() == null) {
+ 	        throw new BusinessException("Já existe conteúdo neste idioma");
+ 	    }
  		
  		content.setLanguage(language);
  		content.setUrlHandle(contentDto.getUrlHandle());
@@ -136,9 +167,29 @@ public class AdminPostService {
  		content.setIsDraft(contentDto.getIsDraft());
  		content.setPost(post);
  		
+ 		if (content.getTitle() == null || content.getTitle().trim().isEmpty()) {
+ 	        throw new BusinessException("Título é obrigatório para o idioma " + language);
+ 	    }
+ 	    
+ 	    // Validação do URL handle
+ 	    if (content.getUrlHandle() == null || content.getUrlHandle().trim().isEmpty()) {
+ 	        throw new BusinessException("URL handle é obrigatório para o idioma " + language);
+ 	    }
+ 	    
+ 	    // Validação de URL handle único
+ 	    Optional<Post> postWithSameHandle = postRepository.findByContentsUrlHandleAndContentsLanguage(
+ 	            content.getUrlHandle(), language);
+ 	    if (postWithSameHandle.isPresent() && !postWithSameHandle.get().getId().equals(post.getId())) {
+ 	        throw new BusinessException("URL handle já existe para o idioma " + language);
+ 	    }
+ 		
  		content.getTags().clear();
  		if (contentDto.getTags() != null) {
+ 			Set<String> tagNames = new HashSet<>();
  			for (TagDTO tagDto : contentDto.getTags()) {
+ 				if (!tagNames.add(tagDto.getName().toLowerCase())) {
+ 		            throw new BusinessException("Tag duplicada");
+ 		        }
  				Tag tag;
  				if (tagDto.isNew()) {
  					tag = new Tag();
@@ -153,6 +204,9 @@ public class AdminPostService {
  		}
  		
  		content.getCategories().clear();
+ 	    if (contentDto.getCategories() == null || contentDto.getCategories().isEmpty()) {
+ 	        throw new BusinessException("Categoria é obrigatória para o idioma " + language);
+ 	    }
  		if (contentDto.getCategories() != null) {
  			for (CategoryDTO categoryDto : contentDto.getCategories()) {
  				Category category;

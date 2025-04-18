@@ -32,6 +32,8 @@ public class User implements Serializable {
 	@Column(unique = true)
 	private String email;
 	private String password;
+	private String bio;
+	private String imageUrl;
 	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "tb_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -98,6 +100,26 @@ public class User implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getBio() {
+		return bio;
+	}
+
+	public void setBio(String bio) {
+		this.bio = bio;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public Set<Post> getPosts() {
+		return posts;
 	}
 
 	public Set<Role> getRoles() {

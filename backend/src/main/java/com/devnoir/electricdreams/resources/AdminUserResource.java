@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.devnoir.electricdreams.dto.UserDTO;
 import com.devnoir.electricdreams.dto.UserCreateDTO;
+import com.devnoir.electricdreams.dto.UserDTO;
+import com.devnoir.electricdreams.dto.UserProfileDTO;
+import com.devnoir.electricdreams.dto.UserRoleDTO;
 import com.devnoir.electricdreams.services.AdminUserService;
 
 @RestController
@@ -51,6 +53,18 @@ public class AdminUserResource {
 		UserDTO dto = adminUserService.update(id, userDto);
 		return ResponseEntity.ok().body(dto);
 	}
+	
+	@PutMapping(value = "/{id}/role")
+    public ResponseEntity<UserDTO> updateRole(@PathVariable Long id, @RequestBody UserRoleDTO dto) {
+        UserDTO userDTO = adminUserService.updateRole(id, dto);
+        return ResponseEntity.ok().body(userDTO);
+    }
+    
+    @PutMapping(value = "/{id}/profile")
+    public ResponseEntity<UserDTO> updateProfile(@PathVariable Long id, @RequestBody UserProfileDTO dto) {
+        UserDTO userDTO = adminUserService.updateProfile(id, dto);
+        return ResponseEntity.ok().body(userDTO);
+    }
 	
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {

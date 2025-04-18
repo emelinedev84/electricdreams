@@ -1,7 +1,9 @@
 package com.devnoir.electricdreams.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.devnoir.electricdreams.entities.PostContent;
@@ -19,7 +21,7 @@ public class PostContentDTO implements Serializable {
 	private Long postId;
 	private Boolean isDraft;
     
-	private Set<TagDTO> tags = new HashSet<>();
+	private List<TagDTO> tags = new ArrayList<>();
 	private Set<CategoryDTO> categories = new HashSet<>();
 	
 	public PostContentDTO() {
@@ -95,7 +97,7 @@ public class PostContentDTO implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	public Set<TagDTO> getTags() {
+	public List<TagDTO> getTags() {
 		return tags;
 	}
 	public Set<CategoryDTO> getCategories() {

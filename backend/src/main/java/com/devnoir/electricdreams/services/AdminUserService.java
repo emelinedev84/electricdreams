@@ -12,8 +12,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.devnoir.electricdreams.dto.RoleDTO;
-import com.devnoir.electricdreams.dto.UserDTO;
 import com.devnoir.electricdreams.dto.UserCreateDTO;
+import com.devnoir.electricdreams.dto.UserDTO;
+import com.devnoir.electricdreams.dto.UserProfileDTO;
+import com.devnoir.electricdreams.dto.UserRoleDTO;
 import com.devnoir.electricdreams.entities.Role;
 import com.devnoir.electricdreams.entities.User;
 import com.devnoir.electricdreams.repositories.RoleRepository;
@@ -44,7 +46,7 @@ public class AdminUserService {
  	@Transactional(readOnly = true) 
  	public UserDTO findById(Long id) {
  		Optional<User> optional = userRepository.findById(id);
- 		User user = optional.orElseThrow(() -> new ResourceNotFoundException("Entity not found")); 
+ 		User user = optional.orElseThrow(() -> new ResourceNotFoundException("Id not found: " + id)); 
  		return new UserDTO(user);
  	}
  	
@@ -68,6 +70,37 @@ public class AdminUserService {
  			throw new ResourceNotFoundException("Id not found: " + id);
  		}
  	}
+ 	
+ 	@Transactional
+    public UserDTO updateRole(Long id, UserRoleDTO dto) {
+        try {
+            User user = userRepository.getReferenceById(id);
+            Role role = roleRepository.findByAuthority(dto.getRole())
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + dto.getRole()));
+            
+            user.getRoles().clear();
+            user.getRoles().add(role);
+            user = userRepository.save(user);
+            return new UserDTO(user);
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Id not found: " + id);
+        }
+    }
+    
+    @Transactional
+    public UserDTO updateProfile(Long id, UserProfileDTO dto) {
+        try {
+            User user = userRepository.getReferenceById(id);
+            user.setFirstName(dto.getFirstName());
+            user.setLastName(dto.getLastName());
+            user.setBio(dto.getBio());
+            user.setImageUrl(dto.getImageUrl());
+            user = userRepository.save(user);
+            return new UserDTO(user);
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Id not found: " + id);
+        }
+    }
  	
 	@Transactional(propagation = Propagation.SUPPORTS)
 	public void delete(Long id) {

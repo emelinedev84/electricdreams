@@ -42,6 +42,21 @@ public class AdminCategoryService {
 	@Transactional
 	public CategoryDTO insert(CategoryDTO dto) {
 		try {
+			if (categoryRepository.findByNameAndLanguage(dto.getName(), 
+	            Language.valueOf(dto.getLanguage())).isPresent()) {
+	            throw new BusinessException("Categoria já existe neste idioma");
+	        }
+	        
+	        // Validação do idioma
+	        if (dto.getLanguage() == null) {
+	            throw new BusinessException("Idioma é obrigatório");
+	        }
+	        
+	        // Validação do nome
+	        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+	            throw new BusinessException("Nome da categoria é obrigatório");
+	        }
+			
 			Category category = new Category();
 			category.setName(dto.getName());
 			category.setLanguage(Language.valueOf(dto.getLanguage()));
@@ -56,6 +71,13 @@ public class AdminCategoryService {
 	public CategoryDTO update(Long id, CategoryDTO dto) {
 		try {
 			Category category = categoryRepository.getReferenceById(id);
+			
+			Optional<Category> existingCategory = categoryRepository.findByNameAndLanguage(
+	            dto.getName(), Language.valueOf(dto.getLanguage()));
+	        if (existingCategory.isPresent() && !existingCategory.get().getId().equals(id)) {
+	            throw new BusinessException("Categoria já existe neste idioma");
+	        }
+		        
 			category.setName(dto.getName());
 			category = categoryRepository.save(category);
 			return new CategoryDTO(category);

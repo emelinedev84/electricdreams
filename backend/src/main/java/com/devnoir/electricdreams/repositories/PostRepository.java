@@ -15,13 +15,14 @@ import com.devnoir.electricdreams.enums.Language;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-	@Query("SELECT DISTINCT p FROM Post p JOIN p.contents c WHERE c.language = :language AND c.isDraft = false")
+	@Query("SELECT p FROM Post p JOIN p.contents c WHERE c.language = :language AND c.isDraft = false")
     Page<Post> findByContentsLanguageAndContentsIsDraftFalse(
-        @Param("language") Language language, 
-        Pageable pageable);
-
+        @Param("language") Language language, Pageable pageable);
+	
 	Optional<Post> findByContentsUrlHandleAndContentsLanguageAndContentsIsDraftFalse(String urlHandle, Language lang);
 	
 	@Query("SELECT p FROM Post p LEFT JOIN FETCH p.contents WHERE p.id = :id")
 	Optional<Post> findByIdWithContents(@Param("id") Long id);
+
+	Optional<Post> findByContentsUrlHandleAndContentsLanguage(String urlHandle, Language language);
 }
