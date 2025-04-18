@@ -50,7 +50,13 @@ public class BlogCategoryServiceTest {
     
     @Test
     void shouldThrowBusinessExceptionWhenInvalidLanguage() {
-    	assertThatThrownBy(() -> blogCategoryService.findAllByLanguage("invalid", PageRequest.of(0, 10)))
+    	// First validate the language is invalid
+        String invalidLanguage = "invalid";
+        
+        // Then test the service call
+        assertThatThrownBy(() -> {
+            blogCategoryService.findAllByLanguage(invalidLanguage, PageRequest.of(0, 10));
+        })
         .isInstanceOf(BusinessException.class)
         .hasMessageContaining("Idioma inválido: invalid");
     }

@@ -18,33 +18,34 @@ import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
 @RequestMapping(value = "/profile")
 public class UserProfileResource {
 
+	private static final String TEST_USER = "testuser";
+	
 	@Autowired
     private UserRepository userRepository;
 
     @GetMapping(value = "/me")
     public ResponseEntity<UserDTO> getOwnProfile() {
         // Como ainda não temos autenticação, vamos criar um usuário de teste se não existir
-        User user = userRepository.findByUsername("testuser")
-            .orElseGet(() -> {
-                User newUser = new User();
-                newUser.setUsername("testuser");
-                newUser.setEmail("testuser@example.com");
-                newUser.setFirstName("Test");
-                newUser.setLastName("User");
-                return userRepository.save(newUser);
-            });
-        return ResponseEntity.ok(new UserDTO(user));
+    	User user = userRepository.findByUsername(TEST_USER)  // Usando a constante
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setUsername(TEST_USER);  // Usando a constante
+                    newUser.setEmail("test@example.com");
+                    newUser.setPassword("password123");
+                    return userRepository.save(newUser);
+                });
+            return ResponseEntity.ok(new UserDTO(user));
     }
 
     @PutMapping(value = "/me")
-    public ResponseEntity<?> updateOwnProfile(@RequestBody UserProfileDTO dto) {
+    public ResponseEntity<UserDTO> updateOwnProfile(@RequestBody UserProfileDTO dto) {
         // Validação básica de email
         if (dto.getEmail() != null && !dto.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             return ResponseEntity.unprocessableEntity().build();
         }
 
-        User user = userRepository.findByUsername("testuser")
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findByUsername(TEST_USER)  // Usando a constante
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         
         if (dto.getFirstName() != null) user.setFirstName(dto.getFirstName());
         if (dto.getLastName() != null) user.setLastName(dto.getLastName());

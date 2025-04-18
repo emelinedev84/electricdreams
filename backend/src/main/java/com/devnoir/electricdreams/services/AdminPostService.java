@@ -144,86 +144,129 @@ public class AdminPostService {
         return postRepository.save(post);
     }
  	
- 	private void updateOrCreateContent(Post post, PostContentDTO contentDto, Language language) {
- 	// Primeiro verifica se já existe conteúdo para este idioma
- 	    boolean hasExistingContent = post.getContents().stream()
- 	            .anyMatch(c -> c.getLanguage() == language);
- 	            
- 	    // Se estamos criando um novo conteúdo (não atualizando) e já existe um para este idioma
- 	    PostContent content = post.getContents().stream()
- 	            .filter(c -> c.getLanguage() == language)
- 	            .findFirst()
- 	            .orElse(new PostContent());
- 	            
- 	    if (hasExistingContent && content.getId() == null) {
- 	        throw new BusinessException("Já existe conteúdo neste idioma");
- 	    }
- 		
- 		content.setLanguage(language);
- 		content.setUrlHandle(contentDto.getUrlHandle());
- 		content.setTitle(contentDto.getTitle());
- 		content.setContent(contentDto.getContent());
- 		content.setMetaDescription(contentDto.getMetaDescription());
- 		content.setIsDraft(contentDto.getIsDraft());
- 		content.setPost(post);
- 		
- 		if (content.getTitle() == null || content.getTitle().trim().isEmpty()) {
- 	        throw new BusinessException("Título é obrigatório para o idioma " + language);
- 	    }
- 	    
- 	    // Validação do URL handle
- 	    if (content.getUrlHandle() == null || content.getUrlHandle().trim().isEmpty()) {
- 	        throw new BusinessException("URL handle é obrigatório para o idioma " + language);
- 	    }
- 	    
- 	    // Validação de URL handle único
- 	    Optional<Post> postWithSameHandle = postRepository.findByContentsUrlHandleAndContentsLanguage(
- 	            content.getUrlHandle(), language);
- 	    if (postWithSameHandle.isPresent() && !postWithSameHandle.get().getId().equals(post.getId())) {
- 	        throw new BusinessException("URL handle já existe para o idioma " + language);
- 	    }
- 		
- 		content.getTags().clear();
- 		if (contentDto.getTags() != null) {
- 			Set<String> tagNames = new HashSet<>();
- 			for (TagDTO tagDto : contentDto.getTags()) {
- 				if (!tagNames.add(tagDto.getName().toLowerCase())) {
- 		            throw new BusinessException("Tag duplicada");
- 		        }
- 				Tag tag;
- 				if (tagDto.isNew()) {
- 					tag = new Tag();
- 					tag.setName(tagDto.getName());
- 					tag.setLanguage(Language.valueOf(tagDto.getLanguage()));
- 					tag = tagRepository.save(tag);
- 				} else {
- 					tag = tagRepository.findById(tagDto.getId()).orElseThrow(() -> new ResourceNotFoundException("Tag not found: " + tagDto.getId()));
- 				}
- 				content.getTags().add(tag);
- 			}
- 		}
- 		
- 		content.getCategories().clear();
- 	    if (contentDto.getCategories() == null || contentDto.getCategories().isEmpty()) {
- 	        throw new BusinessException("Categoria é obrigatória para o idioma " + language);
- 	    }
- 		if (contentDto.getCategories() != null) {
- 			for (CategoryDTO categoryDto : contentDto.getCategories()) {
- 				Category category;
- 				if (categoryDto.isNew()) {
- 					category = new Category();
- 					category.setName(categoryDto.getName());
- 					category.setLanguage(Language.valueOf(categoryDto.getLanguage()));
- 					category = categoryRepository.save(category);
- 				} else {
- 					category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new ResourceNotFoundException("Category not found: " + categoryDto.getId()));
- 				}
- 				content.getCategories().add(category);
- 			}
- 		}
- 		
- 		if (!post.getContents().contains(content)) {
- 			post.getContents().add(content);
- 		}
- 	}
+    private void updateOrCreateContent(Post post, PostContentDTO contentDto, Language language) {
+        PostContent content = findOrCreateContent(post, language);
+        updateContentBasicInfo(content, contentDto, post, language);
+        validateContent(content, post, language);
+        updateContentTags(content, contentDto);
+        updateContentCategories(content, contentDto, language);
+        
+        if (!post.getContents().contains(content)) {
+            post.getContents().add(content);
+        }
+    }
+
+    private PostContent findOrCreateContent(Post post, Language language) {
+        boolean hasExistingContent = post.getContents().stream()
+                .anyMatch(c -> c.getLanguage() == language);
+                
+        PostContent content = post.getContents().stream()
+                .filter(c -> c.getLanguage() == language)
+                .findFirst()
+                .orElse(new PostContent());
+                
+        if (hasExistingContent && content.getId() == null) {
+            throw new BusinessException("Já existe conteúdo neste idioma");
+        }
+        
+        return content;
+    }
+
+    private void updateContentBasicInfo(PostContent content, PostContentDTO contentDto, Post post, Language language) {
+        content.setLanguage(language);
+        content.setUrlHandle(contentDto.getUrlHandle());
+        content.setTitle(contentDto.getTitle());
+        content.setContent(contentDto.getContent());
+        content.setMetaDescription(contentDto.getMetaDescription());
+        content.setIsDraft(contentDto.getIsDraft());
+        content.setPost(post);
+    }
+
+    private void validateContent(PostContent content, Post post, Language language) {
+        validateTitle(content, language);
+        validateUrlHandle(content, post, language);
+    }
+
+    private void validateTitle(PostContent content, Language language) {
+        if (content.getTitle() == null || content.getTitle().trim().isEmpty()) {
+            throw new BusinessException("Título é obrigatório para o idioma " + language);
+        }
+    }
+
+    private void validateUrlHandle(PostContent content, Post post, Language language) {
+        if (content.getUrlHandle() == null || content.getUrlHandle().trim().isEmpty()) {
+            throw new BusinessException("URL handle é obrigatório para o idioma " + language);
+        }
+        
+        Optional<Post> postWithSameHandle = postRepository.findByContentsUrlHandleAndContentsLanguage(
+                content.getUrlHandle(), language);
+        if (postWithSameHandle.isPresent() && !postWithSameHandle.get().getId().equals(post.getId())) {
+            throw new BusinessException("URL handle já existe para o idioma " + language);
+        }
+    }
+
+    private void updateContentTags(PostContent content, PostContentDTO contentDto) {
+        content.getTags().clear();
+        if (contentDto.getTags() != null) {
+            Set<String> tagNames = new HashSet<>();
+            for (TagDTO tagDto : contentDto.getTags()) {
+                validateAndAddTag(content, tagDto, tagNames);
+            }
+        }
+    }
+
+    private void validateAndAddTag(PostContent content, TagDTO tagDto, Set<String> tagNames) {
+        if (!tagNames.add(tagDto.getName().toLowerCase())) {
+            throw new BusinessException("Tag duplicada");
+        }
+        Tag tag = tagDto.isNew() ? createNewTag(tagDto) : findExistingTag(tagDto);
+        content.getTags().add(tag);
+    }
+
+    private Tag createNewTag(TagDTO tagDto) {
+        Tag tag = new Tag();
+        tag.setName(tagDto.getName());
+        tag.setLanguage(Language.valueOf(tagDto.getLanguage()));
+        return tagRepository.save(tag);
+    }
+
+    private Tag findExistingTag(TagDTO tagDto) {
+        return tagRepository.findById(tagDto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Tag not found: " + tagDto.getId()));
+    }
+
+    private void updateContentCategories(PostContent content, PostContentDTO contentDto, Language language) {
+        content.getCategories().clear();
+        validateCategories(contentDto, language);
+        
+        if (contentDto.getCategories() != null) {
+            contentDto.getCategories().forEach(categoryDto -> 
+                addCategory(content, categoryDto));
+        }
+    }
+
+    private void validateCategories(PostContentDTO contentDto, Language language) {
+        if (contentDto.getCategories() == null || contentDto.getCategories().isEmpty()) {
+            throw new BusinessException("Categoria é obrigatória para o idioma " + language);
+        }
+    }
+
+    private void addCategory(PostContent content, CategoryDTO categoryDto) {
+        Category category = categoryDto.isNew() ? 
+            createNewCategory(categoryDto) : 
+            findExistingCategory(categoryDto);
+        content.getCategories().add(category);
+    }
+
+    private Category createNewCategory(CategoryDTO categoryDto) {
+        Category category = new Category();
+        category.setName(categoryDto.getName());
+        category.setLanguage(Language.valueOf(categoryDto.getLanguage()));
+        return categoryRepository.save(category);
+    }
+
+    private Category findExistingCategory(CategoryDTO categoryDto) {
+        return categoryRepository.findById(categoryDto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found: " + categoryDto.getId()));
+    }
 }

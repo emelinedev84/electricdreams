@@ -73,13 +73,21 @@ public class AdminUserResourceTest {
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
     void shouldCreateNewUserWithSpecifiedRole() throws Exception {
+    	// Primeiro garantir que a role WRITER existe
+        Role writerRole = roleRepository.findByAuthority("ROLE_WRITER")
+            .orElseGet(() -> {
+                Role role = new Role();
+                role.setAuthority("ROLE_WRITER");
+                return roleRepository.save(role);
+            });
+
         UserCreateDTO dto = new UserCreateDTO();
         dto.setUsername("newuser");
         dto.setEmail("newuser@example.com");
         dto.setPassword("password123");
         
         RoleDTO roleDto = new RoleDTO();
-        roleDto.setId(2L); // assumindo que 2 é o ID da role WRITER
+        roleDto.setId(writerRole.getId()); // Usar o ID da role que acabamos de criar/buscar
         dto.getRoles().add(roleDto);
 
         mockMvc.perform(post("/users")
@@ -93,10 +101,10 @@ public class AdminUserResourceTest {
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
     void shouldUpdateUserDataAndRole() throws Exception {
-    	// Criar usuário de teste usando o setup existente
+    	// Criar usuário de teste com email único
         User user = new User();
         user.setUsername("testuser");
-        user.setEmail("test@example.com");
+        user.setEmail("updatetest@example.com"); // Email único
         user.setPassword("password123");
         
         // Usar a role WRITER que já foi criada no setup
@@ -106,7 +114,7 @@ public class AdminUserResourceTest {
         user = userRepository.save(user);
 
         // Criar DTO para atualização com role ADMIN
-        UserRoleDTO dto = new UserRoleDTO("ROLE_ADMIN");  // Usando o construtor correto
+        UserRoleDTO dto = new UserRoleDTO("ROLE_ADMIN");
 
         // Fazer a requisição de atualização
         mockMvc.perform(put("/users/{id}/role", user.getId())
@@ -162,13 +170,20 @@ public class AdminUserResourceTest {
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
     void shouldAllowAdminAccessToAllResources() throws Exception {
+    	// Criar um usuário primeiro para poder testá-lo
+        User user = new User();
+        user.setUsername("testuser");
+        user.setEmail("testaccess@example.com"); // Email único
+        user.setPassword("password123");
+        user = userRepository.save(user);
+
         // Testa acesso a listagem
         mockMvc.perform(get("/users")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        // Testa acesso a usuário específico
-        mockMvc.perform(get("/users/{id}", 1L)
+        // Testa acesso a usuário específico usando o ID do usuário criado
+        mockMvc.perform(get("/users/{id}", user.getId())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
