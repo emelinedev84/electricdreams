@@ -52,6 +52,9 @@ public class AdminUserService {
  	
  	@Transactional
  	public UserDTO insert(UserCreateDTO dto) {
+ 	    // Validações de negócio específicas do service
+        validateUserCreation(dto);
+        
  		User user = new User();
  		copyDtoToEntity(dto, user);
  		user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -61,6 +64,9 @@ public class AdminUserService {
  	
  	@Transactional
  	public UserDTO update(Long id, UserDTO dto) {
+ 		// Validações de negócio específicas do service
+        validateUserUpdate(id, dto);
+ 		
  		try {
  			User user = userRepository.getReferenceById(id);
  			copyDtoToEntity(dto, user);
@@ -113,6 +119,17 @@ public class AdminUserService {
 			throw new DatabaseException("Integrity violation");
 		}
 	}
+	
+	// Métodos de validação de negócio
+    private void validateUserCreation(UserCreateDTO dto) {
+        // Validações específicas de criação que não podem ser feitas no DTO
+        // Por exemplo: validações que dependem do estado atual do sistema
+    }
+    
+    private void validateUserUpdate(Long id, UserDTO dto) {
+        // Validações específicas de atualização
+        // Por exemplo: verificar se o usuário tem permissão para atualizar
+    }
 	
  	private void copyDtoToEntity(UserDTO dto, User user) {
  		user.setUsername(dto.getUsername());

@@ -22,6 +22,8 @@ import com.devnoir.electricdreams.dto.UserProfileDTO;
 import com.devnoir.electricdreams.dto.UserRoleDTO;
 import com.devnoir.electricdreams.services.AdminUserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/users")
 public class AdminUserResource {
@@ -42,26 +44,26 @@ public class AdminUserResource {
 	}
 	
 	@PostMapping
-	public ResponseEntity<UserDTO> insert(@RequestBody UserCreateDTO dto) {
+	public ResponseEntity<UserDTO> insert(@Valid @RequestBody UserCreateDTO dto) {
 		UserDTO newDto = adminUserService.insert(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newDto.getId()).toUri();
 		return ResponseEntity.created(uri).body(newDto);
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO userDto) {
+	public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserDTO userDto) {
 		UserDTO dto = adminUserService.update(id, userDto);
 		return ResponseEntity.ok().body(dto);
 	}
 	
 	@PutMapping(value = "/{id}/role")
-    public ResponseEntity<UserDTO> updateRole(@PathVariable Long id, @RequestBody UserRoleDTO dto) {
+    public ResponseEntity<UserDTO> updateRole(@PathVariable Long id, @Valid @RequestBody UserRoleDTO dto) {
         UserDTO userDTO = adminUserService.updateRole(id, dto);
         return ResponseEntity.ok().body(userDTO);
     }
     
     @PutMapping(value = "/{id}/profile")
-    public ResponseEntity<UserDTO> updateProfile(@PathVariable Long id, @RequestBody UserProfileDTO dto) {
+    public ResponseEntity<UserDTO> updateProfile(@PathVariable Long id, @Valid @RequestBody UserProfileDTO dto) {
         UserDTO userDTO = adminUserService.updateProfile(id, dto);
         return ResponseEntity.ok().body(userDTO);
     }

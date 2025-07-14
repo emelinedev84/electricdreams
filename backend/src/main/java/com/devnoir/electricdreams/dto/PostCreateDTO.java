@@ -4,11 +4,16 @@ import java.io.Serializable;
 
 import com.devnoir.electricdreams.entities.Post;
 import com.devnoir.electricdreams.enums.Language;
+import com.devnoir.electricdreams.services.validation.PostContentLanguageValid;
 
+import jakarta.validation.constraints.NotNull;
+
+@PostContentLanguageValid
 public class PostCreateDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@NotNull(message = "Author ID is required")
 	private Long authorId;
 	private String imageUrl;
 	private PostContentDTO en;
@@ -25,8 +30,10 @@ public class PostCreateDTO implements Serializable {
 	public PostCreateDTO(Post post) {
 		authorId = post.getAuthor().getId();
 		imageUrl = post.getImageUrl();
-	    en = post.getContents().stream().filter(content -> content.getLanguage() == Language.EN).findFirst().map(x -> new PostContentDTO(x)).orElse(null);
-	    pt = post.getContents().stream().filter(content -> content.getLanguage() == Language.PT).findFirst().map(x -> new PostContentDTO(x)).orElse(null);
+		en = post.getContents().stream().filter(content -> content.getLanguage() == Language.EN).findFirst()
+				.map(x -> new PostContentDTO(x)).orElse(null);
+		pt = post.getContents().stream().filter(content -> content.getLanguage() == Language.PT).findFirst()
+				.map(x -> new PostContentDTO(x)).orElse(null);
 	}
 
 	public Long getAuthorId() {

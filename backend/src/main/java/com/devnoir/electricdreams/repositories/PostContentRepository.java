@@ -16,4 +16,8 @@ public interface PostContentRepository extends JpaRepository<PostContent, Long> 
 	 Optional<PostContent> findByUrlHandleAndLanguage(String urlHandle, Language language);
 
 	 Optional<PostContent> findByPostAndLanguage(Post post, Language language);
+	 
+	 boolean existsByUrlHandleAndLanguage(String urlHandle, Language language);
+	 
+	 boolean existsByPostIdAndLanguage(Long postId, Language language);
 }

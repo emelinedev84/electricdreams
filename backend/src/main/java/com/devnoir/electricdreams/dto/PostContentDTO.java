@@ -7,21 +7,35 @@ import java.util.List;
 import java.util.Set;
 
 import com.devnoir.electricdreams.entities.PostContent;
+import com.devnoir.electricdreams.services.validation.PostContentValid;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+@PostContentValid
 public class PostContentDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
+	@NotNull(message = "Language must be specified")
 	private String language;
+	@NotBlank(message = "URL handle is required")
 	private String urlHandle;
+	@NotBlank(message = "Title is required")
+    @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
 	private String title;
+	@NotBlank(message = "Content is required")
 	private String content;
+	@Size(min = 50, max = 160, message = "Meta description must be between 50 and 160 characters")
 	private String metaDescription;
 	private Long postId;
 	private Boolean isDraft;
     
 	private List<TagDTO> tags = new ArrayList<>();
+	@NotEmpty(message = "At least one category is required")
 	private Set<CategoryDTO> categories = new HashSet<>();
 	
 	public PostContentDTO() {

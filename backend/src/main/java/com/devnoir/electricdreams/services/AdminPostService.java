@@ -56,13 +56,12 @@ public class AdminPostService {
  	@Transactional(readOnly = true) 
  	public PostDTO findById(Long id) {
  	    Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post not found")); 
- 	    
  	    return new PostDTO(post);
  	}
  	
  	@Transactional
  	public PostDTO create(PostCreateDTO dto) {
- 	    validateCreateDTO(dto);
+ 	    validatePostCreation(dto);
  	    
  	    Post post = new Post();
  	    post = postRepository.save(post); // Salvar primeiro para ter o ID
@@ -72,7 +71,7 @@ public class AdminPostService {
  	
  	@Transactional
  	public PostDTO update(Long id, PostCreateDTO dto) {
- 		validateCreateDTO(dto);
+ 		validatePostUpdate(id, dto);
  		
 		Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post not found: " + id));
 		return new PostDTO(createOrUpdatePostBasicInfo(post, dto));
@@ -112,15 +111,34 @@ public class AdminPostService {
  	    }
 	}
  	
- 	private void validateCreateDTO(PostCreateDTO dto) {
+ 	private void validatePostCreation(PostCreateDTO dto) {
+ 	    // Validações específicas de criação
  		if (dto.getAuthorId() == null) {
  	        throw new BusinessException("Author ID must not be null");
  	    }
+ 		
+ 		// Verificar se o autor existe
+        if (!userRepository.existsById(dto.getAuthorId())) {
+            throw new ResourceNotFoundException("Author not found: " + dto.getAuthorId());
+        }
 
- 	    if (dto.getEn() == null && dto.getPt() == null) {
- 	        throw new BusinessException("Post must have content in at least one language");
- 	    }
+		/*
+		 * if (dto.getEn() == null && dto.getPt() == null) { throw new
+		 * BusinessException("Post must have content in at least one language"); }
+		 */
  	}
+ 	
+ 	private void validatePostUpdate(Long id, PostCreateDTO dto) {
+        // Validações específicas de atualização
+        if (dto.getAuthorId() == null) {
+            throw new BusinessException("Author ID must not be null");
+        }
+        
+        // Verificar se o autor existe
+        if (!userRepository.existsById(dto.getAuthorId())) {
+            throw new ResourceNotFoundException("Author not found: " + dto.getAuthorId());
+        }
+    }
  	
     private Post createOrUpdatePostBasicInfo(Post post, PostCreateDTO dto) {
     	// Primeiro instanciar o post se for null
@@ -147,7 +165,6 @@ public class AdminPostService {
     private void updateOrCreateContent(Post post, PostContentDTO contentDto, Language language) {
         PostContent content = findOrCreateContent(post, language);
         updateContentBasicInfo(content, contentDto, post, language);
-        validateContent(content, post, language);
         updateContentTags(content, contentDto);
         updateContentCategories(content, contentDto, language);
         
@@ -182,29 +199,6 @@ public class AdminPostService {
         content.setPost(post);
     }
 
-    private void validateContent(PostContent content, Post post, Language language) {
-        validateTitle(content, language);
-        validateUrlHandle(content, post, language);
-    }
-
-    private void validateTitle(PostContent content, Language language) {
-        if (content.getTitle() == null || content.getTitle().trim().isEmpty()) {
-            throw new BusinessException("Título é obrigatório para o idioma " + language);
-        }
-    }
-
-    private void validateUrlHandle(PostContent content, Post post, Language language) {
-        if (content.getUrlHandle() == null || content.getUrlHandle().trim().isEmpty()) {
-            throw new BusinessException("URL handle é obrigatório para o idioma " + language);
-        }
-        
-        Optional<Post> postWithSameHandle = postRepository.findByContentsUrlHandleAndContentsLanguage(
-                content.getUrlHandle(), language);
-        if (postWithSameHandle.isPresent() && !postWithSameHandle.get().getId().equals(post.getId())) {
-            throw new BusinessException("URL handle já existe para o idioma " + language);
-        }
-    }
-
     private void updateContentTags(PostContent content, PostContentDTO contentDto) {
         content.getTags().clear();
         if (contentDto.getTags() != null) {
@@ -237,17 +231,10 @@ public class AdminPostService {
 
     private void updateContentCategories(PostContent content, PostContentDTO contentDto, Language language) {
         content.getCategories().clear();
-        validateCategories(contentDto, language);
         
         if (contentDto.getCategories() != null) {
             contentDto.getCategories().forEach(categoryDto -> 
                 addCategory(content, categoryDto));
-        }
-    }
-
-    private void validateCategories(PostContentDTO contentDto, Language language) {
-        if (contentDto.getCategories() == null || contentDto.getCategories().isEmpty()) {
-            throw new BusinessException("Categoria é obrigatória para o idioma " + language);
         }
     }
 

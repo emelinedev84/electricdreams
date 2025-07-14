@@ -6,15 +6,24 @@ import java.util.Set;
 
 import com.devnoir.electricdreams.entities.User;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class UserDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
+	@NotBlank(message = "Username is required")
+	@Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
 	private String username;
 	private String firstName;
 	private String lastName;
+	@Email(message = "Invalid email")
+	@NotBlank(message = "Email is required")
 	private String email;
+	@Size(max = 500, message = "Bio must not exceed 500 characters")
 	private String bio;
 	private String imageUrl;
 	

@@ -20,12 +20,12 @@ public class BlogCategoryService {
 	
 	@Transactional(readOnly = true)
 	public Page<CategoryDTO> findAllByLanguage(String language, Pageable pageable) {
-        try {
+		try {
             Language lang = Language.valueOf(language.toUpperCase());
             Page<Category> page = categoryRepository.findByLanguage(lang, pageable);
             return page.map(x -> new CategoryDTO(x));
         } catch (IllegalArgumentException e) {
-            throw new BusinessException("Idioma inválido: " + language);
+            throw new BusinessException("Invalid language: " + language);
         }
     }
 }

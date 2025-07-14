@@ -1,10 +1,9 @@
 package com.devnoir.electricdreams.resources;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,48 +15,48 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.devnoir.electricdreams.dto.CategoryDTO;
-import com.devnoir.electricdreams.services.AdminCategoryService;
+import com.devnoir.electricdreams.dto.TagDTO;
+import com.devnoir.electricdreams.services.AdminTagService;
 
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/admin/categories")
-public class AdminCategoryResource {
+@RequestMapping(value = "/admin/tags")
+public class AdminTagResource {
 
 	@Autowired
-	public AdminCategoryService adminCategoryService;
+	public AdminTagService adminTagService;
 	
 	@GetMapping
-	public ResponseEntity<Page<CategoryDTO>> findAll(Pageable pageable) {
-		Page<CategoryDTO> page = adminCategoryService.findAllPaged(pageable);
-		return ResponseEntity.ok().body(page);
+	public ResponseEntity<List<TagDTO>> findAllByLanguage(String language) {
+		List<TagDTO> list = adminTagService.findAllByLanguage(language);
+		return ResponseEntity.ok().body(list);
 	}
 	
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<CategoryDTO> findById(@PathVariable Long id) {
-		CategoryDTO dto = adminCategoryService.findById(id);
+	public ResponseEntity<TagDTO> findById(@PathVariable Long id) {
+		TagDTO dto = adminTagService.findById(id);
 		return ResponseEntity.ok().body(dto);
 	}
 	
 	@PostMapping
-	public ResponseEntity<CategoryDTO> insert(@Valid @RequestBody CategoryDTO dto) {
-		dto = adminCategoryService.create(dto);
+	public ResponseEntity<TagDTO> create(@Valid @RequestBody TagDTO dto) {
+		dto = adminTagService.create(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
 		return ResponseEntity.created(uri).body(dto);
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @Valid @RequestBody CategoryDTO categoryDto) {
-		CategoryDTO dto = new CategoryDTO();
-		dto.setName(categoryDto.getName());
-		dto = adminCategoryService.update(id, dto);
+	public ResponseEntity<TagDTO> update(@PathVariable Long id, @Valid @RequestBody TagDTO tagDto) {
+		TagDTO dto = new TagDTO();
+		dto.setName(tagDto.getName());
+		dto = adminTagService.update(id, dto);
 		return ResponseEntity.ok().body(dto);
 	}
 	
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
-		adminCategoryService.delete(id);
+		adminTagService.delete(id);
 		return ResponseEntity.noContent().build();
 	}
 }

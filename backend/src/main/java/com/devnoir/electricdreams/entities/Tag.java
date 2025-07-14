@@ -16,9 +16,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "tb_tag")
+@Table(name = "tb_tag", uniqueConstraints = {
+	    @UniqueConstraint(columnNames = {"name", "language"})
+	})
 public class Tag implements Serializable {
 
 	private static final long serialVersionUID = 1L;

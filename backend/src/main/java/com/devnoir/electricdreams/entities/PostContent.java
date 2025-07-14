@@ -24,7 +24,8 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "tb_content", uniqueConstraints = {
-	    @UniqueConstraint(columnNames = {"post_id", "language"})
+	    @UniqueConstraint(columnNames = {"post_id", "language"}),
+	    @UniqueConstraint(columnNames = {"url_handle", "language"})
 	})
 public class PostContent implements Serializable {
 
@@ -37,7 +38,7 @@ public class PostContent implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
 	private Language language;
-    
+    @Column(nullable = false)
 	private String urlHandle;
 	private String title;
 	private String content;

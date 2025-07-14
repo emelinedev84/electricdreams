@@ -21,6 +21,8 @@ import com.devnoir.electricdreams.dto.PostDTO;
 import com.devnoir.electricdreams.dto.PostSummaryDTO;
 import com.devnoir.electricdreams.services.AdminPostService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/admin/posts")
 public class AdminPostResource {
@@ -41,14 +43,14 @@ public class AdminPostResource {
 	}
 	
 	@PostMapping
-	public ResponseEntity<PostDTO> create(@RequestBody PostCreateDTO dto) {
+	public ResponseEntity<PostDTO> create(@Valid @RequestBody PostCreateDTO dto) {
 		PostDTO newDto = adminPostService.create(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newDto.getId()).toUri();
 		return ResponseEntity.created(uri).body(newDto);
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<PostDTO> update(@PathVariable Long id, @RequestBody PostCreateDTO dto) {
+	public ResponseEntity<PostDTO> update(@PathVariable Long id, @Valid @RequestBody PostCreateDTO dto) {
 		PostDTO updatedDto = adminPostService.update(id, dto);
 		return ResponseEntity.ok().body(updatedDto);
 	}

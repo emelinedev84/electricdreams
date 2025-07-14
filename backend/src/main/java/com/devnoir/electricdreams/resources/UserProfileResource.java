@@ -14,6 +14,8 @@ import com.devnoir.electricdreams.entities.User;
 import com.devnoir.electricdreams.repositories.UserRepository;
 import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/profile")
 public class UserProfileResource {
@@ -38,7 +40,7 @@ public class UserProfileResource {
     }
 
     @PutMapping(value = "/me")
-    public ResponseEntity<UserDTO> updateOwnProfile(@RequestBody UserProfileDTO dto) {
+    public ResponseEntity<UserDTO> updateOwnProfile(@Valid @RequestBody UserProfileDTO dto) {
         // Validação básica de email
         if (dto.getEmail() != null && !dto.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             return ResponseEntity.unprocessableEntity().build();

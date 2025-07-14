@@ -25,4 +25,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	Optional<Post> findByIdWithContents(@Param("id") Long id);
 
 	Optional<Post> findByContentsUrlHandleAndContentsLanguage(String urlHandle, Language language);
+	
+	Optional<Post> findByContentsLanguage(Language language);
 }
