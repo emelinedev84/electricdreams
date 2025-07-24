@@ -58,6 +58,6 @@ public class BlogCategoryServiceTest {
             blogCategoryService.findAllByLanguage(invalidLanguage, PageRequest.of(0, 10));
         })
         .isInstanceOf(BusinessException.class)
-        .hasMessageContaining("Idioma inválido: invalid");
+        .hasMessageContaining("Invalid language: invalid");
     }
 }

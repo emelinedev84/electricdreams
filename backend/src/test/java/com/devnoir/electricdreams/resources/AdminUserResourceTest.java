@@ -84,7 +84,9 @@ public class AdminUserResourceTest {
         UserCreateDTO dto = new UserCreateDTO();
         dto.setUsername("newuser");
         dto.setEmail("newuser@example.com");
-        dto.setPassword("password123");
+        dto.setPassword("Password123!"); // Senha que atende aos requisitos
+        dto.setFirstName("New");
+        dto.setLastName("User");
         
         RoleDTO roleDto = new RoleDTO();
         roleDto.setId(writerRole.getId()); // Usar o ID da role que acabamos de criar/buscar
@@ -105,7 +107,9 @@ public class AdminUserResourceTest {
         User user = new User();
         user.setUsername("testuser");
         user.setEmail("updatetest@example.com"); // Email único
-        user.setPassword("password123");
+        user.setPassword("Password123!"); // Senha que atende aos requisitos
+        user.setFirstName("New");
+        user.setLastName("User");
         
         // Usar a role WRITER que já foi criada no setup
         Role writerRole = roleRepository.findByAuthority("ROLE_WRITER")
@@ -132,7 +136,9 @@ public class AdminUserResourceTest {
         UserCreateDTO createDto = new UserCreateDTO();
         createDto.setUsername("userToDelete");
         createDto.setEmail("delete@example.com");
-        createDto.setPassword("password123");
+        createDto.setPassword("Password123!"); // Senha que atende aos requisitos
+        createDto.setFirstName("User");
+        createDto.setLastName("ToDelete");
         
         // Adicionar role WRITER
         RoleDTO roleDto = new RoleDTO();

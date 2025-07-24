@@ -148,10 +148,12 @@ public class AdminPostResourceTest {
         dto.setAuthorId(testAuthor.getId());
         
         PostContentDTO contentEN = new PostContentDTO();
+        contentEN.setLanguage("EN"); // Adicionar language obrigatório
         contentEN.setTitle("Test Post");
         contentEN.setUrlHandle("test-post");
         contentEN.setContent("Content");
         contentEN.setIsDraft(false);
+        contentEN.setMetaDescription("This is a test post with at least 50 characters to meet the validation requirements"); // Adicionar metaDescription válido
         
         CategoryDTO category = new CategoryDTO();
         category.setId(categoryEN.getId());
@@ -193,10 +195,12 @@ public class AdminPostResourceTest {
         dto.setAuthorId(testAuthor.getId());
         
         PostContentDTO contentEN = new PostContentDTO();
+        contentEN.setLanguage("EN"); // Adicionar language obrigatório
         contentEN.setTitle("New English Content");
         contentEN.setUrlHandle("new-english-content-" + System.currentTimeMillis());
         contentEN.setContent("English Content");
         contentEN.setIsDraft(false);
+        contentEN.setMetaDescription("This is new English content with at least 50 characters to meet validation requirements"); // Adicionar metaDescription válido
         
         CategoryDTO category = new CategoryDTO();
         category.setId(categoryEN.getId());  // Usando categoria EN para conteúdo EN
@@ -222,10 +226,12 @@ public class AdminPostResourceTest {
         dto.setAuthorId(testAuthor.getId());
         
         PostContentDTO contentEN = new PostContentDTO();
+        contentEN.setLanguage("EN"); // Adicionar language obrigatório
         contentEN.setTitle("Updated Title");
         contentEN.setUrlHandle("updated-title-" + System.currentTimeMillis());
         contentEN.setContent("Updated content");
         contentEN.setIsDraft(false);
+        contentEN.setMetaDescription("This is updated content with at least 50 characters to meet validation requirements"); // Adicionar metaDescription válido
         
         CategoryDTO category = new CategoryDTO();
         category.setId(categoryEN.getId());

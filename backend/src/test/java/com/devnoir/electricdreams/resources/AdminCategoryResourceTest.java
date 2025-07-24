@@ -54,9 +54,7 @@ public class AdminCategoryResourceTest {
                 .andExpect(jsonPath("$.name", is("Nova Categoria")))
                 .andExpect(jsonPath("$.language", is("PT")));
     }
-    
-
-     
+         
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
     void shouldNotCreateDuplicateCategory() throws Exception {

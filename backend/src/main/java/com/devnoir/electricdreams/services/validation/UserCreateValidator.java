@@ -26,7 +26,7 @@ public class UserCreateValidator implements ConstraintValidator<UserCreateValid,
  		 // Validação de email único
  		if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
  			Optional<User> user = userRepository.findByEmail(dto.getEmail());
- 			if (user != null) {
+ 			if (user.isPresent()) {
  				list.add(new FieldMessage("email", "Email already exists"));
  			}
  		}
@@ -34,7 +34,7 @@ public class UserCreateValidator implements ConstraintValidator<UserCreateValid,
  	    // Validação de username único
         if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
             Optional<User> user = userRepository.findByUsername(dto.getUsername());
-            if (user != null) {
+            if (user.isPresent()) {
                 list.add(new FieldMessage("username", "Username already exists"));
             }
         }

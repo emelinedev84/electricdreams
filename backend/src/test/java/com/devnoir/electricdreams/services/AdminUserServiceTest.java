@@ -88,12 +88,12 @@ public class AdminUserServiceTest {
         dto.setEmail("existing@example.com");
         dto.setPassword("password123");
 
-        when(userRepository.save(any(User.class))).thenThrow(new RuntimeException("Duplicate email"));
+        when(userRepository.save(any(User.class))).thenThrow(new RuntimeException("Email already exists"));
 
         // Act & Assert
         assertThatThrownBy(() -> service.insert(dto))
             .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("Duplicate email");
+            .hasMessageContaining("Email already exists");
     }
     
 

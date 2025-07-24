@@ -81,31 +81,31 @@ public class AdminCategoryService {
 
 	private void validateCategoryCreation(CategoryDTO dto) {
 		try {
-			if (categoryRepository.findByNameAndLanguage(dto.getName(), Language.valueOf(dto.getLanguage()))
-					.isPresent()) {
-				throw new BusinessException("Categoria já existe neste idioma");
-			}
+	        if (categoryRepository.findByNameAndLanguage(dto.getName(), Language.valueOf(dto.getLanguage()))
+	                .isPresent()) {
+	            throw new BusinessException("Categoria já existe neste idioma");
+	        }
 
-			// Validação do idioma
-			if (dto.getLanguage() == null) {
-				throw new BusinessException("Idioma é obrigatório");
-			}
+	        // Validação do idioma
+	        if (dto.getLanguage() == null) {
+	            throw new BusinessException("Language is required");
+	        }
 
-			// Validação do nome
-			if (dto.getName() == null || dto.getName().trim().isEmpty()) {
-				throw new BusinessException("Nome da categoria é obrigatório");
-			}
+	        // Validação do nome
+	        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+	            throw new BusinessException("Category name is required");
+	        }
 
-		} catch (IllegalArgumentException e) {
-			throw new BusinessException("Invalid language: " + dto.getLanguage());
-		}
+	    } catch (IllegalArgumentException e) {
+	        throw new BusinessException("Invalid language: " + dto.getLanguage());
+	    }
 	}
 	
 	private void validateCategoryUpdate(Long id, CategoryDTO dto) {
 		Optional<Category> existingCategory = categoryRepository.findByNameAndLanguage(dto.getName(),
 				Language.valueOf(dto.getLanguage()));
 		if (existingCategory.isPresent() && !existingCategory.get().getId().equals(id)) {
-			throw new BusinessException("Categoria já existe neste idioma");
+			throw new BusinessException("Category already exists in this language");
 		}
 	}
 }

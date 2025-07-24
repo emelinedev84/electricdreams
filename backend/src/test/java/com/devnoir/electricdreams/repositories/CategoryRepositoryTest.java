@@ -33,7 +33,7 @@ public class CategoryRepositoryTest {
     @Test
     void shouldDeleteCategory() {
         Category category = new Category();
-        category.setName("Games");
+        category.setName("Music");
         category.setLanguage(Language.EN);
 
         Category saved = categoryRepository.save(category);

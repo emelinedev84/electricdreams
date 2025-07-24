@@ -1,7 +1,6 @@
 package com.devnoir.electricdreams.services;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,11 +120,48 @@ public class AdminPostService {
         if (!userRepository.existsById(dto.getAuthorId())) {
             throw new ResourceNotFoundException("Author not found: " + dto.getAuthorId());
         }
+        
+        // Validar que pelo menos um conteúdo tem categoria
+        if (dto.getEn() != null && (dto.getEn().getCategories() == null || dto.getEn().getCategories().isEmpty())) {
+            throw new BusinessException("Category is required for language EN");
+        }
+        
+        if (dto.getPt() != null && (dto.getPt().getCategories() == null || dto.getPt().getCategories().isEmpty())) {
+            throw new BusinessException("Category is required for language PT");
+        }
 
-		/*
-		 * if (dto.getEn() == null && dto.getPt() == null) { throw new
-		 * BusinessException("Post must have content in at least one language"); }
-		 */
+		if (dto.getEn() == null && dto.getPt() == null) { throw new
+			BusinessException("Post must have content in at least one language"); 
+ 		}
+		
+		// Validar título e handle obrigatórios
+	    if (dto.getEn() != null) {
+	        if (dto.getEn().getTitle() == null || dto.getEn().getTitle().trim().isEmpty()) {
+	            throw new BusinessException("Title is required for language EN");
+	        }
+	        if (dto.getEn().getUrlHandle() == null || dto.getEn().getUrlHandle().trim().isEmpty()) {
+	            throw new BusinessException("URL handle is required for language EN");
+	        }
+	        
+	        // Validar URL handle único
+	        if (postRepository.findByContentsUrlHandleAndContentsLanguage(dto.getEn().getUrlHandle(), Language.EN).isPresent()) {
+	            throw new BusinessException("URL handle already exists for this language: EN");
+	        }
+	    }
+	    
+	    if (dto.getPt() != null) {
+	        if (dto.getPt().getTitle() == null || dto.getPt().getTitle().trim().isEmpty()) {
+	            throw new BusinessException("Title is required for language PT");
+	        }
+	        if (dto.getPt().getUrlHandle() == null || dto.getPt().getUrlHandle().trim().isEmpty()) {
+	            throw new BusinessException("URL handle is required for language PT");
+	        }
+	        
+	        // Validar URL handle único
+	        if (postRepository.findByContentsUrlHandleAndContentsLanguage(dto.getPt().getUrlHandle(), Language.PT).isPresent()) {
+	            throw new BusinessException("URL handle already exists for this language: PT");
+	        }
+	    }
  	}
  	
  	private void validatePostUpdate(Long id, PostCreateDTO dto) {
@@ -183,7 +219,7 @@ public class AdminPostService {
                 .orElse(new PostContent());
                 
         if (hasExistingContent && content.getId() == null) {
-            throw new BusinessException("Já existe conteúdo neste idioma");
+            throw new BusinessException("Content already exists in this language");
         }
         
         return content;
@@ -211,7 +247,7 @@ public class AdminPostService {
 
     private void validateAndAddTag(PostContent content, TagDTO tagDto, Set<String> tagNames) {
         if (!tagNames.add(tagDto.getName().toLowerCase())) {
-            throw new BusinessException("Tag duplicada");
+            throw new BusinessException("Tag already exists in this language");
         }
         Tag tag = tagDto.isNew() ? createNewTag(tagDto) : findExistingTag(tagDto);
         content.getTags().add(tag);

@@ -1,7 +1,7 @@
 package com.devnoir.electricdreams.resources;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
@@ -60,13 +60,10 @@ public class ResourceExceptionHandlerTest {
 
     // Caso de uso: 422 - Regra de negócio violada
     @Test
-    void shouldReturn422_WhenBusinessRuleIsViolated() throws Exception {
-        // TODO: enviar post com dados inválidos (sem conteúdo em idioma)
-        String invalidPostJson = "{ \"title\": null, \"content\": null }";
-
-        mockMvc.perform(post("/admin/posts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidPostJson))
-            .andExpect(status().isUnprocessableEntity());
+    void shouldReturn422WhenBusinessRuleIsViolated() throws Exception {
+        
+        mockMvc.perform(get("/invalid/categories")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity());
     }
 }

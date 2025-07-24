@@ -101,10 +101,13 @@ public class AdminPostServiceTest {
         
         validDto.setEn(contentEN);
 
-        // Configurar mocks padrões
+        
+        // Configurar mocks padrão com lenient para evitar UnnecessaryStubbingException
+        lenient().when(userRepository.existsById(1L)).thenReturn(true);
         lenient().when(userRepository.getReferenceById(1L)).thenReturn(author);
         lenient().when(categoryRepository.findById(1L)).thenReturn(Optional.of(validCategory));
         lenient().when(tagRepository.findById(1L)).thenReturn(Optional.of(validTag));
+        lenient().when(postRepository.save(any(Post.class))).thenReturn(validPost);
     }
 	
 	// Caso de uso: Buscar post por ID
@@ -155,7 +158,7 @@ public class AdminPostServiceTest {
         // Verificar se a exceção é lançada
         assertThatThrownBy(() -> service.create(validDto))
             .isInstanceOf(BusinessException.class)
-            .hasMessageContaining("URL handle já existe para o idioma EN");
+            .hasMessageContaining("URL handle already exists for this language: EN");
     }
 
     // Caso de uso: Conteúdo 1x por idioma
@@ -172,7 +175,7 @@ public class AdminPostServiceTest {
        
         assertThatThrownBy(() -> service.update(1L, validDto))
             .isInstanceOf(BusinessException.class)
-            .hasMessageContaining("Já existe conteúdo neste idioma");
+            .hasMessageContaining("Content already exists in this language");
     }
 
     // Caso de uso: Categoria obrigatória por idioma
@@ -188,9 +191,12 @@ public class AdminPostServiceTest {
         contentEN.setIsDraft(false);
         dto.setEn(contentEN);
 
+        // Configurar mock para autor existir
+        when(userRepository.existsById(1L)).thenReturn(true);
+
         assertThatThrownBy(() -> service.create(dto))
-            .isInstanceOf(BusinessException.class)
-            .hasMessageContaining("Categoria é obrigatória para o idioma EN");
+            .isInstanceOf(BusinessException.class) // Mudar para BusinessException
+            .hasMessageContaining("Category is required for language EN");
     }
 
     // Caso de uso: Excluir apenas conteúdo de idioma
@@ -223,7 +229,7 @@ public class AdminPostServiceTest {
 
         assertThatThrownBy(() -> service.create(validDto))
             .isInstanceOf(BusinessException.class)
-            .hasMessageContaining("Tag duplicada");
+            .hasMessageContaining("Tag already exists in this language");
     }
 
     // Caso de uso: Adicionar nova tag dinamicamente
@@ -280,7 +286,7 @@ public class AdminPostServiceTest {
         
         assertThatThrownBy(() -> service.create(dto))
             .isInstanceOf(BusinessException.class)
-            .hasMessageContaining("Título é obrigatório para o idioma EN");
+            .hasMessageContaining("Title is required");
 
         // Teste para handle vazio mas com título válido
         contentEN.setTitle("Valid Title");
@@ -288,7 +294,7 @@ public class AdminPostServiceTest {
 
         assertThatThrownBy(() -> service.create(dto))
             .isInstanceOf(BusinessException.class)
-            .hasMessageContaining("URL handle é obrigatório para o idioma EN");
+            .hasMessageContaining("URL handle is required");
     }
     
     @Test
