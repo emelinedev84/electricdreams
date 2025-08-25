@@ -1,11 +1,15 @@
 package com.devnoir.electricdreams.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -18,6 +22,7 @@ import com.devnoir.electricdreams.dto.UserProfileDTO;
 import com.devnoir.electricdreams.dto.UserRoleDTO;
 import com.devnoir.electricdreams.entities.Role;
 import com.devnoir.electricdreams.entities.User;
+import com.devnoir.electricdreams.projections.UserDetailsProjection;
 import com.devnoir.electricdreams.repositories.RoleRepository;
 import com.devnoir.electricdreams.repositories.UserRepository;
 import com.devnoir.electricdreams.services.exceptions.DatabaseException;
@@ -26,7 +31,7 @@ import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class AdminUserService {
+public class AdminUserService implements UserDetailsService {
 
 	@Autowired
  	private UserRepository userRepository;
@@ -142,4 +147,22 @@ public class AdminUserService {
  			user.getRoles().add(role);
  		}
  	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+		List<UserDetailsProjection> result = userRepository.searchUserAndRolesByUsername(username);
+		if (result.size() == 0) {
+			throw new UsernameNotFoundException("User not found");
+		}
+		
+		User user = new User();
+		user.setUsername(username);
+		user.setPassword(result.get(0).getPassword());
+		for (UserDetailsProjection projection : result) {
+			user.addRole(new Role(projection.getRoleId(), projection.getAuthority()));
+		}
+		
+		return user;
+	}
 }
