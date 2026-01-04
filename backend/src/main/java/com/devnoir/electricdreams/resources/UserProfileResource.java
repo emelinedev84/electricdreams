@@ -2,6 +2,7 @@ package com.devnoir.electricdreams.resources;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +26,7 @@ public class UserProfileResource {
 	@Autowired
     private UserRepository userRepository;
 
+	@PreAuthorize("hasRole('ROLE_WRITER')")
     @GetMapping(value = "/me")
     public ResponseEntity<UserDTO> getOwnProfile() {
         // Como ainda não temos autenticação, vamos criar um usuário de teste se não existir
@@ -39,6 +41,7 @@ public class UserProfileResource {
             return ResponseEntity.ok(new UserDTO(user));
     }
 
+	@PreAuthorize("hasRole('ROLE_WRITER')")
     @PutMapping(value = "/me")
     public ResponseEntity<UserDTO> updateOwnProfile(@Valid @RequestBody UserProfileDTO dto) {
         // Validação básica de email
