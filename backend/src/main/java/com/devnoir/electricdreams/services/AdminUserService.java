@@ -28,8 +28,6 @@ import com.devnoir.electricdreams.repositories.UserRepository;
 import com.devnoir.electricdreams.services.exceptions.DatabaseException;
 import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
 
-import jakarta.persistence.EntityNotFoundException;
-
 @Service
 public class AdminUserService implements UserDetailsService {
 
@@ -55,6 +53,13 @@ public class AdminUserService implements UserDetailsService {
  		return new UserDTO(user);
  	}
  	
+ 	@Transactional(readOnly = true) 
+ 	public UserDTO findByUsername(String username) {
+ 		Optional<User> optional = userRepository.findByUsername(username);
+ 		User user = optional.orElseThrow(() -> new ResourceNotFoundException("Username not found: " + username)); 
+ 		return new UserDTO(user);
+ 	}
+ 	
  	@Transactional
  	public UserDTO insert(UserCreateDTO dto) {
  	    // Validações de negócio específicas do service
@@ -72,45 +77,36 @@ public class AdminUserService implements UserDetailsService {
  		// Validações de negócio específicas do service
         validateUserUpdate(id, dto);
  		
- 		try {
- 			User user = userRepository.getReferenceById(id);
- 			copyDtoToEntity(dto, user);
- 			user = userRepository.save(user);
- 			return new UserDTO(user);
- 		} catch (EntityNotFoundException e) {
- 			throw new ResourceNotFoundException("Id not found: " + id);
- 		}
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Id not found: " + id));
+        copyDtoToEntity(dto, user);
+        user = userRepository.save(user);
+        return new UserDTO(user);
  	}
  	
  	@Transactional
     public UserDTO updateRole(Long id, UserRoleDTO dto) {
-        try {
-            User user = userRepository.getReferenceById(id);
-            Role role = roleRepository.findByAuthority(dto.getRole())
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + dto.getRole()));
-            
-            user.getRoles().clear();
-            user.getRoles().add(role);
-            user = userRepository.save(user);
-            return new UserDTO(user);
-        } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException("Id not found: " + id);
-        }
+    	User user = userRepository.findById(id)
+    	        .orElseThrow(() -> new ResourceNotFoundException("Id not found: " + id));
+        Role role = roleRepository.findByAuthority(dto.getRole())
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + dto.getRole()));
+        
+        user.getRoles().clear();
+        user.getRoles().add(role);
+        user = userRepository.save(user);
+        return new UserDTO(user);
     }
     
     @Transactional
     public UserDTO updateProfile(Long id, UserProfileDTO dto) {
-        try {
-            User user = userRepository.getReferenceById(id);
-            user.setFirstName(dto.getFirstName());
-            user.setLastName(dto.getLastName());
-            user.setBio(dto.getBio());
-            user.setImageUrl(dto.getImageUrl());
-            user = userRepository.save(user);
-            return new UserDTO(user);
-        } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException("Id not found: " + id);
-        }
+    	User user = userRepository.findById(id)
+    	        .orElseThrow(() -> new ResourceNotFoundException("Id not found: " + id));
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setBio(dto.getBio());
+        user.setImageUrl(dto.getImageUrl());
+        user = userRepository.save(user);
+        return new UserDTO(user);
     }
  	
 	@Transactional(propagation = Propagation.SUPPORTS)
@@ -143,7 +139,8 @@ public class AdminUserService implements UserDetailsService {
  		user.setEmail(dto.getEmail());
  		user.getRoles().clear();
  		for(RoleDTO roleDto : dto.getRoles()) {
- 			Role role = roleRepository.getReferenceById(roleDto.getId());
+ 			Role role = roleRepository.findById(roleDto.getId())
+ 		            .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleDto.getId()));
  			user.getRoles().add(role);
  		}
  	}
@@ -152,7 +149,7 @@ public class AdminUserService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
 		List<UserDetailsProjection> result = userRepository.searchUserAndRolesByUsername(username);
-		if (result.size() == 0) {
+		if (result.isEmpty()) {
 			throw new UsernameNotFoundException("User not found");
 		}
 		

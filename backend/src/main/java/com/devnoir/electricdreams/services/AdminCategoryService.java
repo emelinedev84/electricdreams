@@ -18,8 +18,6 @@ import com.devnoir.electricdreams.services.exceptions.BusinessException;
 import com.devnoir.electricdreams.services.exceptions.DatabaseException;
 import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
 
-import jakarta.persistence.EntityNotFoundException;
-
 @Service
 public class AdminCategoryService {
 
@@ -54,17 +52,20 @@ public class AdminCategoryService {
 
 	@Transactional
 	public CategoryDTO update(Long id, CategoryDTO dto) {
-		// Validações de negócio específicas
 		validateCategoryUpdate(id, dto);
-
-		try {
-			Category category = categoryRepository.getReferenceById(id);
-			category.setName(dto.getName());
-			category = categoryRepository.save(category);
-			return new CategoryDTO(category);
-		} catch (EntityNotFoundException e) {
-			throw new ResourceNotFoundException("Id not found: " + id);
-		}
+	    
+	    Category category = categoryRepository.findById(id)
+	        .orElseThrow(() -> new ResourceNotFoundException("Id not found: " + id));
+	    
+	    // Validar se está tentando mudar o idioma
+	    Language newLanguage = Language.valueOf(dto.getLanguage());
+	    if (!category.getLanguage().equals(newLanguage)) {
+	        throw new BusinessException("Cannot change category language");
+	    }
+	    
+	    category.setName(dto.getName());
+	    category = categoryRepository.save(category);
+	    return new CategoryDTO(category);
 	}
 
 	@Transactional(propagation = Propagation.SUPPORTS)
@@ -102,10 +103,9 @@ public class AdminCategoryService {
 	}
 	
 	private void validateCategoryUpdate(Long id, CategoryDTO dto) {
-		Optional<Category> existingCategory = categoryRepository.findByNameAndLanguage(dto.getName(),
-				Language.valueOf(dto.getLanguage()));
-		if (existingCategory.isPresent() && !existingCategory.get().getId().equals(id)) {
-			throw new BusinessException("Category already exists in this language");
-		}
+		if (categoryRepository.existsByNameAndLanguageAndIdNot(dto.getName(), 
+	            Language.valueOf(dto.getLanguage()), id)) {
+	        throw new BusinessException("Category already exists in this language");
+	    }
 	}
 }

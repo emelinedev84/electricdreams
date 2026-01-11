@@ -1,6 +1,6 @@
-INSERT INTO tb_user (username, first_name, last_name, email, password) VALUES ('rafaelo', 'Rafaelo', 'Cat', 'rafaelo@gmail.com', '$2a$10$TfrNLXTqbr6S69Xeu4n19OkPQXcxu/ap3v9iHmJaRdEg.CL/qiUf2');
-INSERT INTO tb_user (username, first_name, last_name, email, password) VALUES ('fernando', 'Fernando', 'Cat', 'fernando@gmail.com', '$$2a$10$TfrNLXTqbr6S69Xeu4n19OkPQXcxu/ap3v9iHmJaRdEg.CL/qiUf2');
-INSERT INTO tb_user (username, first_name, last_name, email, password) VALUES ('kaka', 'Kaka', 'Dog', 'kaka@gmail.com', '$2a$10$TfrNLXTqbr6S69Xeu4n19OkPQXcxu/ap3v9iHmJaRdEg.CL/qiUf2');
+INSERT INTO tb_user (username, first_name, last_name, email, password) VALUES ('rafaelo', 'Rafaelo', 'Cat', 'rafaelo@gmail.com', '$2a$10$TfrNLXTqbr6S69Xeu4n19OkPQXcxu/ap3v9iHmJaRdEg.CL/qiUf2', 'I'm the cutest cat', 'rafaelo.jpg');
+INSERT INTO tb_user (username, first_name, last_name, email, password) VALUES ('fernando', 'Fernando', 'Cat', 'fernando@gmail.com', '$$2a$10$TfrNLXTqbr6S69Xeu4n19OkPQXcxu/ap3v9iHmJaRdEg.CL/qiUf2', 'Black loving cat', 'fernando.jpg');
+INSERT INTO tb_user (username, first_name, last_name, email, password) VALUES ('kaka', 'Kaka', 'Dog', 'kaka@gmail.com', '$2a$10$TfrNLXTqbr6S69Xeu4n19OkPQXcxu/ap3v9iHmJaRdEg.CL/qiUf2', 'the bestest boy', 'kaka.jpg');
 
 INSERT INTO tb_role (authority) VALUES ('ROLE_WRITER');
 INSERT INTO tb_role (authority) VALUES ('ROLE_ADMIN');

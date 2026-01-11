@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -30,7 +31,7 @@ public class AdminTagResource {
 	
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_WRITER')")
 	@GetMapping
-	public ResponseEntity<List<TagDTO>> findAllByLanguage(String language) {
+	public ResponseEntity<List<TagDTO>> findAllByLanguage(@RequestParam String language) {
 		List<TagDTO> list = adminTagService.findAllByLanguage(language);
 		return ResponseEntity.ok().body(list);
 	}
@@ -53,9 +54,7 @@ public class AdminTagResource {
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_WRITER')")
 	@PutMapping(value = "/{id}")
 	public ResponseEntity<TagDTO> update(@PathVariable Long id, @Valid @RequestBody TagDTO tagDto) {
-		TagDTO dto = new TagDTO();
-		dto.setName(tagDto.getName());
-		dto = adminTagService.update(id, dto);
+		TagDTO dto = adminTagService.update(id, tagDto);
 		return ResponseEntity.ok().body(dto);
 	}
 	

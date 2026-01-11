@@ -1,6 +1,7 @@
 package com.devnoir.electricdreams.services;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,26 +55,30 @@ public class AdminPostService {
  	
  	@Transactional(readOnly = true) 
  	public PostDTO findById(Long id) {
- 	    Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post not found")); 
+ 	    Post post = postRepository.findByIdWithContentsTagsAndCategories(id).orElseThrow(() -> new ResourceNotFoundException("Post not found")); 
  	    return new PostDTO(post);
  	}
  	
  	@Transactional
  	public PostDTO create(PostCreateDTO dto) {
- 	    validatePostCreation(dto);
- 	    
+ 		validatePostCreation(dto);
  	    Post post = new Post();
- 	    post = postRepository.save(post); // Salvar primeiro para ter o ID
  	    post = createOrUpdatePostBasicInfo(post, dto);
- 	    return new PostDTO(post);
+ 	    Post savedPost = postRepository.findByIdWithContentsTagsAndCategories(post.getId())
+ 	        .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+ 	    return new PostDTO(savedPost);
  	}
  	
  	@Transactional
  	public PostDTO update(Long id, PostCreateDTO dto) {
  		validatePostUpdate(id, dto);
- 		
-		Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post not found: " + id));
-		return new PostDTO(createOrUpdatePostBasicInfo(post, dto));
+ 	    Post post = postRepository.findById(id)
+ 	        .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + id));
+ 	    Post updatedPost = createOrUpdatePostBasicInfo(post, dto);
+ 	    // Recarregar para garantir que tags e categories estão carregadas
+ 	    Post savedPost = postRepository.findByIdWithContentsTagsAndCategories(updatedPost.getId())
+ 	        .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+ 	    return new PostDTO(savedPost);
  	}
  	
  	@Transactional(propagation = Propagation.SUPPORTS)
@@ -174,6 +179,23 @@ public class AdminPostService {
         if (!userRepository.existsById(dto.getAuthorId())) {
             throw new ResourceNotFoundException("Author not found: " + dto.getAuthorId());
         }
+        
+        // validação de URL handle único na atualização
+        if (dto.getEn() != null && dto.getEn().getUrlHandle() != null) {
+            Optional<Post> existingPost = postRepository.findByContentsUrlHandleAndContentsLanguage(
+                dto.getEn().getUrlHandle(), Language.EN);
+            if (existingPost.isPresent() && !existingPost.get().getId().equals(id)) {
+                throw new BusinessException("URL handle already exists for this language: EN");
+            }
+        }
+        
+        if (dto.getPt() != null && dto.getPt().getUrlHandle() != null) {
+            Optional<Post> existingPost = postRepository.findByContentsUrlHandleAndContentsLanguage(
+                dto.getPt().getUrlHandle(), Language.PT);
+            if (existingPost.isPresent() && !existingPost.get().getId().equals(id)) {
+                throw new BusinessException("URL handle already exists for this language: PT");
+            }
+        }
     }
  	
     private Post createOrUpdatePostBasicInfo(Post post, PostCreateDTO dto) {
@@ -184,7 +206,8 @@ public class AdminPostService {
         
         // Depois setar as informações básicas
         post.setImageUrl(dto.getImageUrl());
-        User user = userRepository.getReferenceById(dto.getAuthorId());
+        User user = userRepository.findById(dto.getAuthorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Author not found: " + dto.getAuthorId()));
         post.setAuthor(user);
         
         // Por fim atualizar o conteúdo
@@ -210,19 +233,15 @@ public class AdminPostService {
     }
 
     private PostContent findOrCreateContent(Post post, Language language) {
-        boolean hasExistingContent = post.getContents().stream()
-                .anyMatch(c -> c.getLanguage() == language);
-                
-        PostContent content = post.getContents().stream()
-                .filter(c -> c.getLanguage() == language)
-                .findFirst()
-                .orElse(new PostContent());
-                
-        if (hasExistingContent && content.getId() == null) {
-            throw new BusinessException("Content already exists in this language");
-        }
-        
-        return content;
+    	return post.getContents().stream()
+    	        .filter(c -> c.getLanguage() == language)
+    	        .findFirst()
+    	        .orElseGet(() -> {
+    	            PostContent newContent = new PostContent();
+    	            newContent.setPost(post);
+    	            newContent.setLanguage(language);
+    	            return newContent;
+    	        });
     }
 
     private void updateContentBasicInfo(PostContent content, PostContentDTO contentDto, Post post, Language language) {
@@ -246,10 +265,23 @@ public class AdminPostService {
     }
 
     private void validateAndAddTag(PostContent content, TagDTO tagDto, Set<String> tagNames) {
-        if (!tagNames.add(tagDto.getName().toLowerCase())) {
-            throw new BusinessException("Tag already exists in this language");
+    	String tagNameLower = tagDto.getName().toLowerCase();
+        if (!tagNames.add(tagNameLower)) {
+            throw new BusinessException("Duplicate tag in this content: " + tagDto.getName());
         }
-        Tag tag = tagDto.isNew() ? createNewTag(tagDto) : findExistingTag(tagDto);
+        
+        Tag tag;
+        if (tagDto.isNew()) {
+            // Se é nova, verificar se já existe no mesmo idioma
+            Language tagLanguage = Language.valueOf(tagDto.getLanguage());
+            Optional<Tag> existingTag = tagRepository.findByNameAndLanguage(tagDto.getName(), tagLanguage);
+            if (existingTag.isPresent()) {
+                throw new BusinessException("Tag already exists in this language: " + tagDto.getName());
+            }
+            tag = createNewTag(tagDto);
+        } else {
+            tag = findExistingTag(tagDto);
+        }
         content.getTags().add(tag);
     }
 

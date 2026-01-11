@@ -54,9 +54,7 @@ public class AdminCategoryResource {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PutMapping(value = "/{id}")
 	public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @Valid @RequestBody CategoryDTO categoryDto) {
-		CategoryDTO dto = new CategoryDTO();
-		dto.setName(categoryDto.getName());
-		dto = adminCategoryService.update(id, dto);
+		CategoryDTO dto = adminCategoryService.update(id, categoryDto);
 		return ResponseEntity.ok().body(dto);
 	}
 	

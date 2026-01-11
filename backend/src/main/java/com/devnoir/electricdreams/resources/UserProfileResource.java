@@ -13,6 +13,7 @@ import com.devnoir.electricdreams.dto.UserDTO;
 import com.devnoir.electricdreams.dto.UserProfileDTO;
 import com.devnoir.electricdreams.entities.User;
 import com.devnoir.electricdreams.repositories.UserRepository;
+import com.devnoir.electricdreams.services.AdminUserService;
 import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
 
 import jakarta.validation.Valid;
@@ -25,6 +26,9 @@ public class UserProfileResource {
 	
 	@Autowired
     private UserRepository userRepository;
+	
+	@Autowired
+	private AdminUserService adminUserService;
 
 	@PreAuthorize("hasRole('ROLE_WRITER')")
     @GetMapping(value = "/me")
@@ -44,21 +48,10 @@ public class UserProfileResource {
 	@PreAuthorize("hasRole('ROLE_WRITER')")
     @PutMapping(value = "/me")
     public ResponseEntity<UserDTO> updateOwnProfile(@Valid @RequestBody UserProfileDTO dto) {
-        // Validação básica de email
-        if (dto.getEmail() != null && !dto.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            return ResponseEntity.unprocessableEntity().build();
-        }
-
         User user = userRepository.findByUsername(TEST_USER)  // Usando a constante
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         
-        if (dto.getFirstName() != null) user.setFirstName(dto.getFirstName());
-        if (dto.getLastName() != null) user.setLastName(dto.getLastName());
-        if (dto.getBio() != null) user.setBio(dto.getBio());
-        if (dto.getImageUrl() != null) user.setImageUrl(dto.getImageUrl());
-        if (dto.getEmail() != null) user.setEmail(dto.getEmail());
-        
-        user = userRepository.save(user);
-        return ResponseEntity.ok(new UserDTO(user));
+        // Usar o serviço ao invés de atualizar diretamente
+        return ResponseEntity.ok(adminUserService.updateProfile(user.getId(), dto));
     }
 }

@@ -1,0 +1,955 @@
+{
+	"info": {
+		"_postman_id": "electric-dreams-api-collection",
+		"name": "Electric Dreams API",
+		"description": "Coleção completa para testar todos os endpoints da API Electric Dreams",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Get OAuth2 Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic {{client_credentials}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "testuser",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/oauth2/token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"oauth2",
+								"token"
+							]
+						},
+						"description": "Obtém token OAuth2 usando password grant customizado. Client credentials devem ser base64 encoded (clientId:clientSecret)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Categories",
+			"item": [
+				{
+					"name": "List All Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/categories?page=0&size=10&sort=id,asc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "id,asc"
+								}
+							]
+						},
+						"description": "Lista todas as categorias (requer ROLE_ADMIN)"
+					}
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/categories/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"categories",
+								"1"
+							]
+						},
+						"description": "Busca categoria por ID (requer ROLE_ADMIN)"
+					}
+				},
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Technology\",\n    \"language\": \"EN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"categories"
+							]
+						},
+						"description": "Cria uma nova categoria (requer ROLE_ADMIN)"
+					}
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Technology\",\n    \"language\": \"EN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/categories/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"categories",
+								"1"
+							]
+						},
+						"description": "Atualiza uma categoria existente (requer ROLE_ADMIN)"
+					}
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/categories/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"categories",
+								"1"
+							]
+						},
+						"description": "Deleta uma categoria (requer ROLE_ADMIN)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Posts",
+			"item": [
+				{
+					"name": "List All Posts (Summary)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/posts?page=0&size=10&sort=id,asc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "id,asc"
+								}
+							]
+						},
+						"description": "Lista todos os posts em formato resumido (requer ROLE_ADMIN ou ROLE_WRITER)"
+					}
+				},
+				{
+					"name": "Get Post by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/posts/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"posts",
+								"1"
+							]
+						},
+						"description": "Busca post completo por ID (requer ROLE_ADMIN ou ROLE_WRITER)"
+					}
+				},
+				{
+					"name": "Create Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"authorId\": 1,\n    \"imageUrl\": \"https://example.com/image.jpg\",\n    \"en\": {\n        \"language\": \"EN\",\n        \"urlHandle\": \"my-first-post\",\n        \"title\": \"My First Post\",\n        \"content\": \"This is the content of my first post in English.\",\n        \"metaDescription\": \"A description of my first post for SEO purposes\",\n        \"isDraft\": false,\n        \"tags\": [\n            {\n                \"name\": \"technology\",\n                \"language\": \"EN\"\n            }\n        ],\n        \"categories\": [\n            {\n                \"id\": 1\n            }\n        ]\n    },\n    \"pt\": {\n        \"language\": \"PT\",\n        \"urlHandle\": \"meu-primeiro-post\",\n        \"title\": \"Meu Primeiro Post\",\n        \"content\": \"Este é o conteúdo do meu primeiro post em português.\",\n        \"metaDescription\": \"Uma descrição do meu primeiro post para fins de SEO\",\n        \"isDraft\": false,\n        \"tags\": [\n            {\n                \"name\": \"tecnologia\",\n                \"language\": \"PT\"\n            }\n        ],\n        \"categories\": [\n            {\n                \"id\": 1\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/posts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"posts"
+							]
+						},
+						"description": "Cria um novo post (requer ROLE_ADMIN ou ROLE_WRITER)"
+					}
+				},
+				{
+					"name": "Update Post",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"authorId\": 1,\n    \"imageUrl\": \"https://example.com/updated-image.jpg\",\n    \"en\": {\n        \"language\": \"EN\",\n        \"urlHandle\": \"my-updated-post\",\n        \"title\": \"My Updated Post\",\n        \"content\": \"This is the updated content.\",\n        \"metaDescription\": \"Updated description\",\n        \"isDraft\": false,\n        \"tags\": [],\n        \"categories\": []\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/posts/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"posts",
+								"1"
+							]
+						},
+						"description": "Atualiza um post existente (requer ROLE_ADMIN ou ROLE_WRITER)"
+					}
+				},
+				{
+					"name": "Delete Post",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/posts/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"posts",
+								"1"
+							]
+						},
+						"description": "Deleta um post completo (requer ROLE_ADMIN ou ROLE_WRITER)"
+					}
+				},
+				{
+					"name": "Delete Post Content",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/posts/1/content/EN",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"posts",
+								"1",
+								"content",
+								"EN"
+							]
+						},
+						"description": "Deleta o conteúdo de um post em um idioma específico (requer ROLE_ADMIN ou ROLE_WRITER)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Tags",
+			"item": [
+				{
+					"name": "List Tags by Language",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/tags?language=EN",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"tags"
+							],
+							"query": [
+								{
+									"key": "language",
+									"value": "EN"
+								}
+							]
+						},
+						"description": "Lista todas as tags de um idioma específico (requer ROLE_ADMIN ou ROLE_WRITER)"
+					}
+				},
+				{
+					"name": "Get Tag by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/tags/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"tags",
+								"1"
+							]
+						},
+						"description": "Busca tag por ID (requer ROLE_ADMIN ou ROLE_WRITER)"
+					}
+				},
+				{
+					"name": "Create Tag",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"javascript\",\n    \"language\": \"EN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/tags",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"tags"
+							]
+						},
+						"description": "Cria uma nova tag (requer ROLE_ADMIN ou ROLE_WRITER)"
+					}
+				},
+				{
+					"name": "Update Tag",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"updated-tag\",\n    \"language\": \"EN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/tags/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"tags",
+								"1"
+							]
+						},
+						"description": "Atualiza uma tag existente (requer ROLE_ADMIN ou ROLE_WRITER)"
+					}
+				},
+				{
+					"name": "Delete Tag",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/tags/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"tags",
+								"1"
+							]
+						},
+						"description": "Deleta uma tag (requer ROLE_ADMIN ou ROLE_WRITER)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Users",
+			"item": [
+				{
+					"name": "List All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?page=0&size=10&sort=id,asc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "id,asc"
+								}
+							]
+						},
+						"description": "Lista todos os usuários (requer ROLE_ADMIN)"
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						},
+						"description": "Busca usuário por ID (requer ROLE_ADMIN)"
+					}
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"newuser\",\n    \"email\": \"newuser@example.com\",\n    \"password\": \"Password123!\",\n    \"firstName\": \"New\",\n    \"lastName\": \"User\",\n    \"bio\": \"A new user bio\",\n    \"imageUrl\": \"https://example.com/avatar.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Cria um novo usuário (requer ROLE_ADMIN). Senha deve ter pelo menos 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial."
+					}
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"updateduser\",\n    \"email\": \"updated@example.com\",\n    \"firstName\": \"Updated\",\n    \"lastName\": \"User\",\n    \"bio\": \"Updated bio\",\n    \"imageUrl\": \"https://example.com/updated-avatar.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						},
+						"description": "Atualiza um usuário existente (requer ROLE_ADMIN)"
+					}
+				},
+				{
+					"name": "Update User Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": \"ROLE_WRITER\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/1/role",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1",
+								"role"
+							]
+						},
+						"description": "Atualiza a role de um usuário (requer ROLE_ADMIN)"
+					}
+				},
+				{
+					"name": "Update User Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"bio\": \"Updated bio\",\n    \"imageUrl\": \"https://example.com/profile.jpg\",\n    \"email\": \"john.doe@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/1/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1",
+								"profile"
+							]
+						},
+						"description": "Atualiza o perfil de um usuário (requer ROLE_ADMIN)"
+					}
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						},
+						"description": "Deleta um usuário (requer ROLE_ADMIN)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Blog - Public",
+			"item": [
+				{
+					"name": "List Posts by Language",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/EN?page=0&size=10&sort=id,desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"EN"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "id,desc"
+								}
+							]
+						},
+						"description": "Lista todos os posts públicos de um idioma específico (público, não requer autenticação)"
+					}
+				},
+				{
+					"name": "Get Post by URL Handle",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/EN/posts/my-first-post",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"EN",
+								"posts",
+								"my-first-post"
+							]
+						},
+						"description": "Busca um post público pelo URL handle e idioma (público, não requer autenticação)"
+					}
+				},
+				{
+					"name": "List Categories by Language",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/EN/categories?page=0&size=10&sort=id,asc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"EN",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "id,asc"
+								}
+							]
+						},
+						"description": "Lista todas as categorias de um idioma específico (público, não requer autenticação)"
+					}
+				}
+			]
+		},
+		{
+			"name": "User Profile",
+			"item": [
+				{
+					"name": "Get Own Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/profile/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profile",
+								"me"
+							]
+						},
+						"description": "Busca o próprio perfil (requer ROLE_WRITER)"
+					}
+				},
+				{
+					"name": "Update Own Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"bio\": \"My updated bio\",\n    \"imageUrl\": \"https://example.com/my-profile.jpg\",\n    \"email\": \"myemail@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/profile/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profile",
+								"me"
+							]
+						},
+						"description": "Atualiza o próprio perfil (requer ROLE_WRITER)"
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "client_credentials",
+			"value": "bXljbGllbnRpZDpteWNsaWVudHNlY3JldA==",
+			"type": "string",
+			"description": "Base64 encoded clientId:clientSecret (default: myclientid:myclientsecret)"
+		}
+	]
+}

@@ -20,6 +20,7 @@ import com.devnoir.electricdreams.dto.UserProfileDTO;
 import com.devnoir.electricdreams.entities.User;
 import com.devnoir.electricdreams.repositories.PostRepository;
 import com.devnoir.electricdreams.repositories.UserRepository;
+import com.devnoir.electricdreams.tests.TokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -38,12 +39,21 @@ public class UserProfileResourceTest {
     @Autowired
     private PostRepository postRepository;
     
+    @Autowired
+    private TokenUtil tokenUtil;
+    
+    private String username, password, bearerToken;
+    
     @BeforeEach
-    void setup() {
+    void setup() throws Exception {
         // Primeiro limpa os posts para não violar a constraint de chave estrangeira
         postRepository.deleteAll();
         // Depois limpa os usuários
         userRepository.deleteAll();
+        
+        username = "Fernando";
+        password = "123456";
+        bearerToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
         
         User user = new User();
         user.setUsername("testuser");
@@ -57,6 +67,7 @@ public class UserProfileResourceTest {
     @WithMockUser(username = "testuser")
     void shouldGetOwnProfileWhenAuthenticated() throws Exception {
         mockMvc.perform(get("/profile/me")
+        		.header("Authorization", "Bearer" + bearerToken)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username", is("testuser")))
@@ -73,6 +84,7 @@ public class UserProfileResourceTest {
         dto.setEmail("john.doe@example.com");
 
         mockMvc.perform(put("/profile/me")
+        		.header("Authorization", "Bearer" + bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())

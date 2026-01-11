@@ -14,7 +14,7 @@ import com.devnoir.electricdreams.projections.UserDetailsProjection;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-Optional<User> findByUsername(String username);
+	Optional<User> findByUsername(String username);
     
     Optional<User> findByEmail(String email);
     

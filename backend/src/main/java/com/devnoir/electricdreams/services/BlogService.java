@@ -23,7 +23,7 @@ public class BlogService {
 	public Page<PostDTO> findAllPublicPosts(String language, Pageable pageable) {
  		try {
             Language lang = Language.valueOf(language.toUpperCase());
-            Page<Post> page = postRepository.findByContentsLanguageAndContentsIsDraftFalse(lang, pageable);
+            Page<Post> page = postRepository.findByContentsLanguageAndContentsIsDraftFalseWithTagsAndCategories(lang, pageable);
             return page.map(post -> new PostDTO(post, lang));
         } catch (IllegalArgumentException e) {
             throw new BusinessException("Invalid language: " + language);
@@ -34,7 +34,7 @@ public class BlogService {
 	public PostDTO findPostByUrlHandleAndLanguage(String urlHandle, String language) {
  		try {
             Language lang = Language.valueOf(language.toUpperCase());
-            Post post = postRepository.findByContentsUrlHandleAndContentsLanguageAndContentsIsDraftFalse(urlHandle, lang)
+            Post post = postRepository.findByContentsUrlHandleAndContentsLanguageAndContentsIsDraftFalseWithTagsAndCategories(urlHandle, lang)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
             return new PostDTO(post, lang);
         } catch (IllegalArgumentException e) {

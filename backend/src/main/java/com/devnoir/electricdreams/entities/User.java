@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,7 +37,7 @@ public class User implements UserDetails {
 	private String bio;
 	private String imageUrl;
 	
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany
 	@JoinTable(name = "tb_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 	
@@ -48,13 +47,15 @@ public class User implements UserDetails {
 	public User() {
 	}
 
-	public User(Long id, String username, String firstName, String lastName, String email, String password) {
+	public User(Long id, String username, String firstName, String lastName, String email, String password, String bio, String imageUrl) {
 		this.id = id;
 		this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.password = password;
+		this.bio = bio;
+		this.imageUrl = imageUrl;
 	}
 
 	public Long getId() {
@@ -134,12 +135,8 @@ public class User implements UserDetails {
 	}
 	
 	public boolean hasRole(String roleName) {
-		for (Role role : roles) {
-			if (role.getAuthority().equals(roleName)) {
-				return true;
-			}
-		}
-		return false;
+		return roles.stream()
+		        .anyMatch(role -> role.getAuthority().equals(roleName));
 	}
 
 	@Override

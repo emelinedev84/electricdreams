@@ -26,10 +26,14 @@ public class AdminTagService {
 	
 	@Transactional(readOnly = true)
 	public List<TagDTO> findAllByLanguage(String language) {
-		Language lang = Language.valueOf(language.toUpperCase());
-		return tagRepository.findByLanguage(lang).stream()
-				.map(TagDTO::new)
-				.collect(Collectors.toList());
+		try {
+	        Language lang = Language.valueOf(language.toUpperCase());
+	        return tagRepository.findByLanguage(lang).stream()
+	                .map(TagDTO::new)
+	                .collect(Collectors.toList());
+	    } catch (IllegalArgumentException e) {
+	        throw new BusinessException("Invalid language: " + language);
+	    }
 	}
 	
 	@Transactional(readOnly = true)

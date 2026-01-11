@@ -43,20 +43,22 @@ private static final long serialVersionUID = 1L;
         authorId = post.getAuthor() != null ? post.getAuthor().getId() : null;
         
         // Se houver algum conteúdo, usa o primeiro para os campos principais
-        post.getContents().stream()
-            .findFirst()
-            .ifPresent(firstContent -> {
-                this.title = firstContent.getTitle();
-                this.urlHandle = firstContent.getUrlHandle();
-                this.content = firstContent.getContent();
-                this.metaDescription = firstContent.getMetaDescription();
-                this.isDraft = firstContent.getIsDraft();
-                firstContent.getTags().forEach(tag -> this.tags.add(new TagDTO(tag)));
-                firstContent.getCategories().forEach(category -> this.categories.add(new CategoryDTO(category)));
-            });
+        if (post.getContents() != null && !post.getContents().isEmpty()) {
+	        post.getContents().stream()
+	            .findFirst()
+	            .ifPresent(firstContent -> {
+	                this.title = firstContent.getTitle();
+	                this.urlHandle = firstContent.getUrlHandle();
+	                this.content = firstContent.getContent();
+	                this.metaDescription = firstContent.getMetaDescription();
+	                this.isDraft = firstContent.getIsDraft();
+	                firstContent.getTags().forEach(tag -> this.tags.add(new TagDTO(tag)));
+	                firstContent.getCategories().forEach(category -> this.categories.add(new CategoryDTO(category)));
+	            });
         
         // Mantém todos os conteúdos na lista contents
         post.getContents().forEach(postContent -> this.contents.add(new PostContentDTO(postContent)));
+        }
     }
     
     public PostDTO(Post post, Language language) {
