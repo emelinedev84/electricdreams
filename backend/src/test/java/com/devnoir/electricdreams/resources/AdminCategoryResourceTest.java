@@ -15,7 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.devnoir.electricdreams.dto.CategoryDTO;
+import com.devnoir.blog.dto.CategoryDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest

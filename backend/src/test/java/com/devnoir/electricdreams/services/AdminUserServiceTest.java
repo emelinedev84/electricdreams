@@ -14,12 +14,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.devnoir.electricdreams.dto.UserCreateDTO;
-import com.devnoir.electricdreams.dto.UserDTO;
-import com.devnoir.electricdreams.entities.User;
-import com.devnoir.electricdreams.repositories.RoleRepository;
-import com.devnoir.electricdreams.repositories.UserRepository;
-import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
+import com.devnoir.blog.dto.UserCreateDTO;
+import com.devnoir.blog.dto.UserDTO;
+import com.devnoir.blog.entities.User;
+import com.devnoir.blog.repositories.RoleRepository;
+import com.devnoir.blog.repositories.UserRepository;
+import com.devnoir.blog.services.AdminUserService;
+import com.devnoir.blog.services.exceptions.ResourceNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class AdminUserServiceTest {

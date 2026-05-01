@@ -11,12 +11,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.devnoir.electricdreams.entities.Category;
-import com.devnoir.electricdreams.entities.Post;
-import com.devnoir.electricdreams.entities.PostContent;
-import com.devnoir.electricdreams.enums.Language;
-import com.devnoir.electricdreams.repositories.CategoryRepository;
-import com.devnoir.electricdreams.repositories.PostRepository;
+import com.devnoir.blog.entities.Category;
+import com.devnoir.blog.entities.Post;
+import com.devnoir.blog.entities.PostContent;
+import com.devnoir.blog.enums.Language;
+import com.devnoir.blog.repositories.CategoryRepository;
+import com.devnoir.blog.repositories.PostRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc

@@ -16,11 +16,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import com.devnoir.electricdreams.dto.CategoryDTO;
-import com.devnoir.electricdreams.entities.Category;
-import com.devnoir.electricdreams.enums.Language;
-import com.devnoir.electricdreams.repositories.CategoryRepository;
-import com.devnoir.electricdreams.services.exceptions.DatabaseException;
+import com.devnoir.blog.dto.CategoryDTO;
+import com.devnoir.blog.entities.Category;
+import com.devnoir.blog.enums.Language;
+import com.devnoir.blog.repositories.CategoryRepository;
+import com.devnoir.blog.services.AdminCategoryService;
+import com.devnoir.blog.services.exceptions.DatabaseException;
 
 @ExtendWith(MockitoExtension.class)
 public class AdminCategoryServiceTest {

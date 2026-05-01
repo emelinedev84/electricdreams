@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
-import com.devnoir.electricdreams.enums.Language;
+import com.devnoir.blog.entities.Tag;
+import com.devnoir.blog.enums.Language;
 
 public class TagTest {
 

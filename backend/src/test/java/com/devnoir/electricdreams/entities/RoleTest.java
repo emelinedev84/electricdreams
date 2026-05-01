@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
+import com.devnoir.blog.entities.Role;
+
 public class RoleTest {
 
 	@Test

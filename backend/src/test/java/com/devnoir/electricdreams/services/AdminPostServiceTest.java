@@ -16,23 +16,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.devnoir.electricdreams.dto.CategoryDTO;
-import com.devnoir.electricdreams.dto.PostContentDTO;
-import com.devnoir.electricdreams.dto.PostCreateDTO;
-import com.devnoir.electricdreams.dto.PostDTO;
-import com.devnoir.electricdreams.dto.TagDTO;
-import com.devnoir.electricdreams.entities.Category;
-import com.devnoir.electricdreams.entities.Post;
-import com.devnoir.electricdreams.entities.PostContent;
-import com.devnoir.electricdreams.entities.Tag;
-import com.devnoir.electricdreams.entities.User;
-import com.devnoir.electricdreams.enums.Language;
-import com.devnoir.electricdreams.repositories.CategoryRepository;
-import com.devnoir.electricdreams.repositories.PostRepository;
-import com.devnoir.electricdreams.repositories.TagRepository;
-import com.devnoir.electricdreams.repositories.UserRepository;
-import com.devnoir.electricdreams.services.exceptions.BusinessException;
-import com.devnoir.electricdreams.services.exceptions.ResourceNotFoundException;
+import com.devnoir.blog.dto.CategoryDTO;
+import com.devnoir.blog.dto.PostContentDTO;
+import com.devnoir.blog.dto.PostCreateDTO;
+import com.devnoir.blog.dto.PostDTO;
+import com.devnoir.blog.dto.TagDTO;
+import com.devnoir.blog.entities.Category;
+import com.devnoir.blog.entities.Post;
+import com.devnoir.blog.entities.PostContent;
+import com.devnoir.blog.entities.Tag;
+import com.devnoir.blog.entities.User;
+import com.devnoir.blog.enums.Language;
+import com.devnoir.blog.repositories.CategoryRepository;
+import com.devnoir.blog.repositories.PostRepository;
+import com.devnoir.blog.repositories.TagRepository;
+import com.devnoir.blog.repositories.UserRepository;
+import com.devnoir.blog.services.AdminPostService;
+import com.devnoir.blog.services.exceptions.BusinessException;
+import com.devnoir.blog.services.exceptions.ResourceNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class AdminPostServiceTest {

@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import com.devnoir.electricdreams.entities.Post;
-import com.devnoir.electricdreams.entities.User;
+import com.devnoir.blog.entities.Post;
+import com.devnoir.blog.entities.User;
+import com.devnoir.blog.repositories.PostRepository;
+import com.devnoir.blog.repositories.UserRepository;
 
 @DataJpaTest
 public class PostRepositoryTest {

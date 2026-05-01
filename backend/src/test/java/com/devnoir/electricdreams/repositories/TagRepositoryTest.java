@@ -8,8 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import com.devnoir.electricdreams.entities.Tag;
-import com.devnoir.electricdreams.enums.Language;
+import com.devnoir.blog.entities.Tag;
+import com.devnoir.blog.enums.Language;
+import com.devnoir.blog.repositories.TagRepository;
 
 @DataJpaTest
 public class TagRepositoryTest {

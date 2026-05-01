@@ -15,12 +15,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import com.devnoir.electricdreams.dto.PostDTO;
-import com.devnoir.electricdreams.entities.Post;
-import com.devnoir.electricdreams.entities.PostContent;
-import com.devnoir.electricdreams.entities.User;
-import com.devnoir.electricdreams.enums.Language;
-import com.devnoir.electricdreams.repositories.PostRepository;
+import com.devnoir.blog.dto.PostDTO;
+import com.devnoir.blog.entities.Post;
+import com.devnoir.blog.entities.PostContent;
+import com.devnoir.blog.entities.User;
+import com.devnoir.blog.enums.Language;
+import com.devnoir.blog.repositories.PostRepository;
+import com.devnoir.blog.services.BlogService;
 
 @ExtendWith(MockitoExtension.class)
 public class BlogServiceTest {

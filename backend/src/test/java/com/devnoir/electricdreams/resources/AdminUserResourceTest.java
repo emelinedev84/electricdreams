@@ -16,13 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.devnoir.electricdreams.dto.RoleDTO;
-import com.devnoir.electricdreams.dto.UserCreateDTO;
-import com.devnoir.electricdreams.dto.UserRoleDTO;
-import com.devnoir.electricdreams.entities.Role;
-import com.devnoir.electricdreams.entities.User;
-import com.devnoir.electricdreams.repositories.RoleRepository;
-import com.devnoir.electricdreams.repositories.UserRepository;
+import com.devnoir.blog.dto.RoleDTO;
+import com.devnoir.blog.dto.UserCreateDTO;
+import com.devnoir.blog.dto.UserRoleDTO;
+import com.devnoir.blog.entities.Role;
+import com.devnoir.blog.entities.User;
+import com.devnoir.blog.repositories.RoleRepository;
+import com.devnoir.blog.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest

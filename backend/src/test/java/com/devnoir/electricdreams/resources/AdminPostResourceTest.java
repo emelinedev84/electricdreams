@@ -21,19 +21,19 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.devnoir.electricdreams.dto.CategoryDTO;
-import com.devnoir.electricdreams.dto.PostContentDTO;
-import com.devnoir.electricdreams.dto.PostCreateDTO;
-import com.devnoir.electricdreams.entities.Category;
-import com.devnoir.electricdreams.entities.Post;
-import com.devnoir.electricdreams.entities.PostContent;
-import com.devnoir.electricdreams.entities.Role;
-import com.devnoir.electricdreams.entities.User;
-import com.devnoir.electricdreams.enums.Language;
-import com.devnoir.electricdreams.repositories.CategoryRepository;
-import com.devnoir.electricdreams.repositories.PostRepository;
-import com.devnoir.electricdreams.repositories.RoleRepository;
-import com.devnoir.electricdreams.repositories.UserRepository;
+import com.devnoir.blog.dto.CategoryDTO;
+import com.devnoir.blog.dto.PostContentDTO;
+import com.devnoir.blog.dto.PostCreateDTO;
+import com.devnoir.blog.entities.Category;
+import com.devnoir.blog.entities.Post;
+import com.devnoir.blog.entities.PostContent;
+import com.devnoir.blog.entities.Role;
+import com.devnoir.blog.entities.User;
+import com.devnoir.blog.enums.Language;
+import com.devnoir.blog.repositories.CategoryRepository;
+import com.devnoir.blog.repositories.PostRepository;
+import com.devnoir.blog.repositories.RoleRepository;
+import com.devnoir.blog.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest

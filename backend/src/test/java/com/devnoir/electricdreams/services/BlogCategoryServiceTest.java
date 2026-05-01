@@ -16,11 +16,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import com.devnoir.electricdreams.dto.CategoryDTO;
-import com.devnoir.electricdreams.entities.Category;
-import com.devnoir.electricdreams.enums.Language;
-import com.devnoir.electricdreams.repositories.CategoryRepository;
-import com.devnoir.electricdreams.services.exceptions.BusinessException;
+import com.devnoir.blog.dto.CategoryDTO;
+import com.devnoir.blog.entities.Category;
+import com.devnoir.blog.enums.Language;
+import com.devnoir.blog.repositories.CategoryRepository;
+import com.devnoir.blog.services.BlogCategoryService;
+import com.devnoir.blog.services.exceptions.BusinessException;
 
 @ExtendWith(MockitoExtension.class)
 public class BlogCategoryServiceTest {

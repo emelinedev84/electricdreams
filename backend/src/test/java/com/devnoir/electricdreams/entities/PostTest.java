@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
+import com.devnoir.blog.entities.Post;
+import com.devnoir.blog.entities.User;
+
 public class PostTest {
 
 	@Test
