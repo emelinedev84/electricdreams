@@ -34,8 +34,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 		   "LEFT JOIN FETCH p.tags " +
 		   "LEFT JOIN FETCH p.categories " +
 		   "JOIN p.contents c " +
-		   "WHERE c.language = 'EN' AND c.status = 'PUBLISHED'")
-	Page<Post> findPublicPostsWithPublishedEn(Pageable pageable);
+		   "WHERE c.language = :language AND c.status = 'PUBLISHED'")
+	Page<Post> findPublicPostsByLanguage(@Param("language") Language language, Pageable pageable);
 	
 	@Query("""
 	       SELECT DISTINCT p FROM Post p
@@ -44,10 +44,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	       LEFT JOIN FETCH p.categories categories
 	       JOIN p.contents c
 	       WHERE categories.code = :categoryCode
-	       AND c.language = 'EN'
+	       AND c.language = :language
 	       AND c.status = 'PUBLISHED'
 	       """)
-	Page<Post> findPublicPostsByCategoryCode(@Param("categoryCode") String categoryCode, Pageable pageable);
+	Page<Post> findPublicPostsByCategoryCodeAndLanguage(@Param("categoryCode") String categoryCode, @Param("language") Language language, Pageable pageable);
 	
 	@Query("""
 	       SELECT DISTINCT p FROM Post p
@@ -56,10 +56,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	       LEFT JOIN FETCH p.categories
 	       JOIN p.contents c
 	       WHERE tags.code = :tagCode
-	       AND c.language = 'EN'
+	       AND c.language = :language
 	       AND c.status = 'PUBLISHED'
 	       """)
-	Page<Post> findPublicPostsByTagCode(@Param("tagCode") String tagCode, Pageable pageable);
+	Page<Post> findPublicPostsByTagCodeAndLanguage(@Param("tagCode") String tagCode, @Param("language") Language language, Pageable pageable);
 	
 	@Query("SELECT DISTINCT p FROM Post p " +
 		   "LEFT JOIN FETCH p.contents " +

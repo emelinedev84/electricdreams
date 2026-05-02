@@ -39,9 +39,11 @@ public class PublicPostSummaryDTO implements Serializable {
 		language = content.getLanguage();
 		fallbackLanguage = content.getLanguage() == requestedLanguage ? null : content.getLanguage();
 		
-		post.getCategories().forEach(category -> categories.add(new CategoryPublicDTO(category.getCode(), category.getLocalizedName(requestedLanguage))));
+		Language responseLanguage = content.getLanguage();
 		
-		post.getTags().forEach(tag -> tags.add(new TagPublicDTO(tag.getCode(), tag.getLocalizedName(requestedLanguage))));
+		post.getCategories().forEach(category -> categories.add(new CategoryPublicDTO(category.getCode(), category.getLocalizedName(responseLanguage))));
+		
+		post.getTags().forEach(tag -> tags.add(new TagPublicDTO(tag.getCode(), tag.getLocalizedName(responseLanguage))));
 	}
 
 	public Long getId() {

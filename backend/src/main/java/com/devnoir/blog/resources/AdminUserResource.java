@@ -50,7 +50,7 @@ public class AdminUserResource {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping
 	public ResponseEntity<UserDTO> insert(@Valid @RequestBody UserCreateDTO dto) {
-		UserDTO newDto = adminUserService.insert(dto);
+		UserDTO newDto = adminUserService.create(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newDto.getId()).toUri();
 		return ResponseEntity.created(uri).body(newDto);
 	}

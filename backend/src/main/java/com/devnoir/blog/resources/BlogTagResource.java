@@ -29,7 +29,7 @@ public class BlogTagResource {
 		return ResponseEntity.ok().body(list);
 	}
 	
-	@GetMapping(value = "/{categoryCode}/posts")
+	@GetMapping(value = "/{tagCode}/posts")
 	public ResponseEntity<Page<PublicPostSummaryDTO>> findPostsByTag(@PathVariable String language, @PathVariable String tagCode, Pageable pageable) {
 		Page<PublicPostSummaryDTO> page = tagService.findPostsByTag(language, tagCode, pageable);
 		return ResponseEntity.ok().body(page);

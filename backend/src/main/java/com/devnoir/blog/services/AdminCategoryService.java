@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.devnoir.blog.dto.CategoryDTO;
@@ -51,17 +50,26 @@ public class AdminCategoryService {
 	public CategoryDTO update(Long id, CategoryDTO dto) {
 	    Category category = categoryRepository.findById(id)
 	        .orElseThrow(() -> new ResourceNotFoundException("Id not found: " + id));
-	    copyDtoToEntity(dto, category);
+	    String newCode;
+	    if (dto.getCode() == null || dto.getCode().isBlank()) {
+	    	newCode = SlugifyHelper.toSlug(dto.getNameEn());
+	    } else {
+	    	newCode = SlugifyHelper.toSlug(dto.getCode());
+	    }
+	    
 	    Optional<Category> currentCode = categoryRepository.findByCode(category.getCode());
 	    if (currentCode.isPresent() && !currentCode.get().getId().equals(id)) {
 	    	throw new BusinessException("Category code already exists: " + category.getCode());
 	    }
 	    
+	    category.setCode(newCode);
+    	category.setNameEn(dto.getNameEn());
+    	category.setNamePt(dto.getNamePt());
 	    category = categoryRepository.save(category);
 	    return new CategoryDTO(category);
 	}
 
-	@Transactional(propagation = Propagation.SUPPORTS)
+	@Transactional
 	public void delete(Long id) {
 		Category category = categoryRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Id not found: " + id));
@@ -80,5 +88,4 @@ public class AdminCategoryService {
     	category.setNameEn(dto.getNameEn());
     	category.setNamePt(dto.getNamePt());
     }
-	
 }

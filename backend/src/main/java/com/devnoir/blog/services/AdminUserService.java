@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.devnoir.blog.dto.RoleDTO;
@@ -26,6 +25,7 @@ import com.devnoir.blog.entities.User;
 import com.devnoir.blog.projections.UserDetailsProjection;
 import com.devnoir.blog.repositories.RoleRepository;
 import com.devnoir.blog.repositories.UserRepository;
+import com.devnoir.blog.services.exceptions.BusinessException;
 import com.devnoir.blog.services.exceptions.DatabaseException;
 import com.devnoir.blog.services.exceptions.ResourceNotFoundException;
 
@@ -101,6 +101,14 @@ public class AdminUserService implements UserDetailsService {
     public UserDTO updateProfile(Long id, UserProfileDTO dto) {
     	User user = userRepository.findById(id)
     	        .orElseThrow(() -> new ResourceNotFoundException("Id not found: " + id));
+    	
+    	if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+    		Optional<User> userWithSameEmail = userRepository.findByEmail(dto.getEmail());
+    		if (userWithSameEmail.isPresent() && userWithSameEmail.get().getId().equals(id)) {
+    			throw new BusinessException("Email already exists");
+    		}
+    		user.setEmail(dto.getEmail());
+    	}
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setBio(dto.getBio());
@@ -109,7 +117,7 @@ public class AdminUserService implements UserDetailsService {
         return new UserDTO(user);
     }
  	
-	@Transactional(propagation = Propagation.SUPPORTS)
+	@Transactional
 	public void delete(Long id) {
 		if (!userRepository.existsById(id)) {
 			throw new ResourceNotFoundException("Id not found: " + id);

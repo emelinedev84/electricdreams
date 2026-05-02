@@ -45,7 +45,7 @@ public class AdminCategoryResource {
 	
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping
-	public ResponseEntity<CategoryDTO> insert(@Valid @RequestBody CategoryDTO dto) {
+	public ResponseEntity<CategoryDTO> create(@Valid @RequestBody CategoryDTO dto) {
 		dto = adminCategoryService.create(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
 		return ResponseEntity.created(uri).body(dto);

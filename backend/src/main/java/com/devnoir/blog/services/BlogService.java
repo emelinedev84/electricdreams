@@ -33,9 +33,9 @@ public class BlogService {
  	@Transactional(readOnly = true)
 	public Page<PublicPostSummaryDTO> findAllPublicPosts(String language, Pageable pageable) {
         Language requestedLanguage = parseLanguage(language);
-        Page<Post> page = postRepository.findPublicPostsWithPublishedEn(pageable);
+        Page<Post> page = postRepository.findPublicPostsByLanguage(requestedLanguage, pageable);
         return page.map(post -> {
-        	PostContent content = resolvePublicContent(post, requestedLanguage);
+        	PostContent content = resolvePublishedContent(post, requestedLanguage);
         	return new PublicPostSummaryDTO(post, content, requestedLanguage);
         });
 	}
@@ -43,9 +43,9 @@ public class BlogService {
  	@Transactional(readOnly = true)
  	public Page<PublicPostSummaryDTO> findPublicPostsByCategory(String language, String categoryCode, Pageable pageable) {
  		Language requestedLanguage = parseLanguage(language);
- 		Page<Post> page = postRepository.findPublicPostsByCategoryCode(categoryCode, pageable);
+ 		Page<Post> page = postRepository.findPublicPostsByCategoryCodeAndLanguage(categoryCode, requestedLanguage, pageable);
  		return page.map(post -> {
- 			PostContent content = resolvePublicContent(post, requestedLanguage);
+ 			PostContent content = resolvePublishedContent(post, requestedLanguage);
  			return new PublicPostSummaryDTO(post, content, requestedLanguage);
  		});
  	}
@@ -53,9 +53,9 @@ public class BlogService {
  	@Transactional(readOnly = true)
  	public Page<PublicPostSummaryDTO> findPublicPostsByTag(String language, String tagCode, Pageable pageable) {
  		Language requestedLanguage = parseLanguage(language);
- 		Page<Post> page = postRepository.findPublicPostsByTagCode(tagCode, pageable);
+ 		Page<Post> page = postRepository.findPublicPostsByTagCodeAndLanguage(tagCode, requestedLanguage, pageable);
  		return page.map(post -> {
- 			PostContent content = resolvePublicContent(post, requestedLanguage);
+ 			PostContent content = resolvePublishedContent(post, requestedLanguage);
  			return new PublicPostSummaryDTO(post, content, requestedLanguage);
  		});
  	}
@@ -81,16 +81,16 @@ public class BlogService {
  					.filter(content -> content.getLanguage() == Language.PT)
  					.filter(content -> content.getStatus() == PostContentStatus.PUBLISHED)
  					.findFirst()
- 					.orElseGet(() -> resolvePublishedEnContent(post));
+ 					.orElseGet(() -> resolvePublishedContent(post, Language.EN));
  		}
- 		return resolvePublishedEnContent(post);
+ 		return resolvePublishedContent(post, requestedLanguage);
  	}
  	
- 	private PostContent resolvePublishedEnContent(Post post) {
+ 	private PostContent resolvePublishedContent(Post post, Language language) {
  		return post.getContents().stream()
- 				.filter(content -> content.getLanguage() == Language.EN)
+ 				.filter(content -> content.getLanguage() == language)
  				.filter(content -> content.getStatus() == PostContentStatus.PUBLISHED)
  				.findFirst()
- 				.orElseThrow(() -> new ResourceNotFoundException("Published EN content not found"));
+ 				.orElseThrow(() -> new ResourceNotFoundException("Published "+ language + " content not found"));
  	}
 }
