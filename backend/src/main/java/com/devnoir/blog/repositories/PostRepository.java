@@ -37,24 +37,28 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 		   "WHERE c.language = 'EN' AND c.status = 'PUBLISHED'")
 	Page<Post> findPublicPostsWithPublishedEn(Pageable pageable);
 	
-	@Query("SELECT DISTINCT p FROM Post p " +
-		   "LEFT JOIN FETCH p.contents " +
-		   "LEFT JOIN FETCH p.tags " +
-		   "LEFT JOIN FETCH p.categories categories" +
-		   "JOIN p.contents c " +
-		   "WHERE categories.code = :categoryCode " +
-		   "AND c.language = 'EN' " +
-		   "AND c.status = 'PUBLISHED'")
+	@Query("""
+	       SELECT DISTINCT p FROM Post p
+	       LEFT JOIN FETCH p.contents
+	       LEFT JOIN FETCH p.tags
+	       LEFT JOIN FETCH p.categories categories
+	       JOIN p.contents c
+	       WHERE categories.code = :categoryCode
+	       AND c.language = 'EN'
+	       AND c.status = 'PUBLISHED'
+	       """)
 	Page<Post> findPublicPostsByCategoryCode(@Param("categoryCode") String categoryCode, Pageable pageable);
 	
-	@Query("SELECT DISTINCT p FROM Post p " +
-		   "LEFT JOIN FETCH p.contents " +
-		   "LEFT JOIN FETCH p.tags tags" +
-		   "LEFT JOIN FETCH p.categories" +
-		   "JOIN p.contents c " +
-		   "WHERE tags.code = :tagCode " +
-		   "AND c.language = 'EN' " +
-		   "AND c.status = 'PUBLISHED'")
+	@Query("""
+	       SELECT DISTINCT p FROM Post p
+	       LEFT JOIN FETCH p.contents
+	       LEFT JOIN FETCH p.tags tags
+	       LEFT JOIN FETCH p.categories
+	       JOIN p.contents c
+	       WHERE tags.code = :tagCode
+	       AND c.language = 'EN'
+	       AND c.status = 'PUBLISHED'
+	       """)
 	Page<Post> findPublicPostsByTagCode(@Param("tagCode") String tagCode, Pageable pageable);
 	
 	@Query("SELECT DISTINCT p FROM Post p " +

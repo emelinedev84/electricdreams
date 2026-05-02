@@ -26,14 +26,8 @@ import org.springframework.web.filter.CorsFilter;
 @EnableMethodSecurity
 public class ResourceServerConfig {
 
-    private final JwtAuthenticationConverter jwtAuthenticationConverter;
-
-	@Value("${cors.origins}")
+    @Value("${cors.origins}")
 	private String corsOrigins;
-
-    ResourceServerConfig(JwtAuthenticationConverter jwtAuthenticationConverter) {
-        this.jwtAuthenticationConverter = jwtAuthenticationConverter;
-    }
 
 	@Bean
 	@Profile("test")

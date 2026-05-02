@@ -39,6 +39,10 @@ public class AdminCategoryService {
 	public CategoryDTO create(CategoryDTO dto) {
 		Category category = new Category();
 		copyDtoToEntity(dto, category);
+		if (categoryRepository.existsByCode(category.getCode())) {
+			throw new BusinessException("Category code already exists: " + category.getCode());
+		}
+		
 		category = categoryRepository.save(category);
 		return new CategoryDTO(category);
 	}
@@ -47,8 +51,12 @@ public class AdminCategoryService {
 	public CategoryDTO update(Long id, CategoryDTO dto) {
 	    Category category = categoryRepository.findById(id)
 	        .orElseThrow(() -> new ResourceNotFoundException("Id not found: " + id));
-	    
 	    copyDtoToEntity(dto, category);
+	    Optional<Category> currentCode = categoryRepository.findByCode(category.getCode());
+	    if (currentCode.isPresent() && !currentCode.get().getId().equals(id)) {
+	    	throw new BusinessException("Category code already exists: " + category.getCode());
+	    }
+	    
 	    category = categoryRepository.save(category);
 	    return new CategoryDTO(category);
 	}

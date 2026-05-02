@@ -42,6 +42,27 @@ public class UrlHandleService {
         throw new IllegalStateException("Could not generate unique urlHandle for title: " + title);
     }
 	
+	public String generateUniqueHandleForUpdate(String title, Language language, Long contentId) {
+        String base = SlugifyHelper.toSlug(title);
+        if (base == null || base.isBlank()) base = "post";
+
+        if (!contentRepository.existsByUrlHandleAndLanguageAndIdNot(base, language, contentId)) {
+            return base;
+        }
+
+        for (int i = 2; i < 10_000; i++) { 
+            String suffix = "-" + i;
+            String candidate = withSuffix(base, suffix);
+
+            if (!contentRepository.existsByUrlHandleAndLanguageAndIdNot(candidate, language, contentId)) {
+                return candidate;
+            }
+        }
+
+        // se chegar aqui, algo muito estranho aconteceu
+        throw new IllegalStateException("Could not generate unique urlHandle for title: " + title);
+    }
+	
 	private String withSuffix(String base, String suffix) {
         int allowed = MAX_LEN - suffix.length();
         String trimmedBase = base.length() > allowed ? base.substring(0, allowed) : base;

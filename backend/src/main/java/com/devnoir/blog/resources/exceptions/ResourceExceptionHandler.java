@@ -4,6 +4,8 @@ import java.time.Instant;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -32,5 +34,21 @@ public class ResourceExceptionHandler {
 	public ResponseEntity<StandardError> business(BusinessException e, HttpServletRequest request) {
 		HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
 		return ResponseEntity.status(status).body(new StandardError(Instant.now(), status.value(), "Business rule violation", e.getMessage(), request.getRequestURI()));
+	}
+	
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ValidationError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
+		HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+		ValidationError error = new ValidationError();
+		error.setError("Validation exception");
+		error.setTimestamp(Instant.now());
+		error.setMessage(e.getMessage());
+		error.setStatus(status.value());
+		error.setPath(request.getRequestURI());
+	
+		for (FieldError f : e.getBindingResult().getFieldErrors()) {
+			error.addError(f.getField(), f.getDefaultMessage());
+		}
+		return ResponseEntity.status(status).body(error);
 	}
 }

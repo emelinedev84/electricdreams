@@ -12,9 +12,9 @@ public class CategoryDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private Long id;
+	private String code;
 	@NotBlank(message = "Category name is required")
     @Size(min = 3, max = 50, message = "Category name must be between 3 and 50 characters")
-	private String code;
 	private String nameEn;
 	private String namePt;
 	

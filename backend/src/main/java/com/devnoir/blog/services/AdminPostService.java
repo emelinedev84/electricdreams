@@ -1,8 +1,5 @@
 package com.devnoir.blog.services;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -28,7 +25,6 @@ import com.devnoir.blog.repositories.CategoryRepository;
 import com.devnoir.blog.repositories.PostRepository;
 import com.devnoir.blog.repositories.TagRepository;
 import com.devnoir.blog.repositories.UserRepository;
-import com.devnoir.blog.services.exceptions.BusinessException;
 import com.devnoir.blog.services.exceptions.DatabaseException;
 import com.devnoir.blog.services.exceptions.ResourceNotFoundException;
 
@@ -62,6 +58,13 @@ public class AdminPostService {
  	    return new PostDTO(post);
  	}
  	
+    private PostContent getContentByLanguage(Post post, Language language) {
+    	return post.getContents().stream()
+    			.filter(content -> content.getLanguage() == language)
+    			.findFirst()
+    			.orElse(null);
+    }
+ 	
  	@Transactional
  	public PostDTO create(PostCreateDTO dto) {
   	    Post post = new Post();
@@ -76,20 +79,12 @@ public class AdminPostService {
         if (dto.getPt() != null) {
         	post.getContents().add(createContent(post, dto.getPt(), Language.PT));
         }        
-        Set<TagDTO> tags = new HashSet<>();
         for (TagDTO tagDto : dto.getTags()) {
-            if (!tags.add(tagDto)) {
-                throw new BusinessException("Duplicate tag in this post: " + tagDto.getCode());
-            }
             Tag tag = tagRepository.findById(tagDto.getId()).orElseThrow(() -> new ResourceNotFoundException("Tag not found: " + tagDto.getId()));
             post.getTags().add(tag);
         }
         
-        Set<CategoryDTO> categories = new HashSet<>();
         for (CategoryDTO categoryDto : dto.getCategories()) {
-            if (!categories.add(categoryDto)) {
-                throw new BusinessException("Duplicate category in this post: " + categoryDto.getCode());
-            }
             Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new ResourceNotFoundException("Category not found: " + categoryDto.getId()));
             post.getCategories().add(category);
         }
@@ -101,6 +96,18 @@ public class AdminPostService {
  	        .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
  	    return new PostDTO(savedPost);
  	}
+ 	
+    private PostContent createContent(Post post, PostContentDTO contentDto, Language language) {
+    	PostContent content = new PostContent();
+    	content.setPost(post);
+    	content.setLanguage(language);
+    	content.setUrlHandle(urlHandleService.generateUniqueHandle(contentDto.getTitle(), language));
+    	content.setTitle(contentDto.getTitle());
+    	content.setContent(contentDto.getContent());
+    	content.setMetaDescription(contentDto.getMetaDescription());
+    	content.setStatus(contentDto.getStatus());
+    	return content;
+    }
  	
  	@Transactional
  	public PostDTO update(Long id, PostCreateDTO dto) {
@@ -152,7 +159,38 @@ public class AdminPostService {
  		return new PostDTO(post);
  	}
  	
- 	@Transactional(propagation = Propagation.SUPPORTS)
+ 	private void updatePostTags(Post post, PostCreateDTO dto) {
+        post.getTags().clear();
+        if (dto.getTags() != null) {
+            for (TagDTO tagDto : dto.getTags()) {
+                Tag tag = tagRepository.findById(tagDto.getId()).orElseThrow(() -> new ResourceNotFoundException("Tag not found: " + tagDto.getId()));
+                post.getTags().add(tag);
+            }
+        }
+    }
+
+    private void updatePostCategories(Post post, PostCreateDTO dto) {
+        post.getCategories().clear();
+        if (dto.getCategories() != null) {
+            for (CategoryDTO categoryDto : dto.getCategories()) {
+                Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new ResourceNotFoundException("Category not found: " + categoryDto.getId()));
+                post.getCategories().add(category);
+            }
+        }
+    }
+    
+    private void updateContent(PostContent content, PostContentDTO dto) {
+    	if (content.getTitle() == dto.getTitle()) {
+    		content.setUrlHandle(urlHandleService.generateUniqueHandleForUpdate(dto.getTitle(), content.getLanguage(), content.getId()));
+    	}
+    	
+    	content.setTitle(dto.getTitle());
+    	content.setContent(dto.getContent());
+    	content.setMetaDescription(dto.getMetaDescription());
+    	content.setStatus(dto.getStatus());
+    }
+ 	
+ 	@Transactional
  	public void deletePost(Long id) {
  		try {
  			Post post = postRepository.findByIdWithContentsTagsAndCategories(id)
@@ -188,58 +226,4 @@ public class AdminPostService {
  	        throw new DatabaseException("Integrity violation");
  	    }
 	}
- 	 	
- 	private void updatePostTags(Post post, PostCreateDTO dto) {
-        post.getTags().clear();
-        if (dto.getTags() != null) {
-            Set<TagDTO> tags = new HashSet<>();
-            for (TagDTO tagDto : dto.getTags()) {
-                if (!tags.add(tagDto)) {
-                    throw new BusinessException("Duplicate tag in this post: " + tagDto.getCode());
-                }
-                Tag tag = tagRepository.findById(tagDto.getId()).orElseThrow(() -> new ResourceNotFoundException("Tag not found: " + tagDto.getId()));
-                post.getTags().add(tag);
-            }
-        }
-    }
-
-    private void updatePostCategories(Post post, PostCreateDTO dto) {
-        post.getCategories().clear();
-        if (dto.getCategories() != null) {
-            Set<CategoryDTO> categories = new HashSet<>();
-            for (CategoryDTO categoryDto : dto.getCategories()) {
-                if (!categories.add(categoryDto)) {
-                    throw new BusinessException("Duplicate category in this post: " + categoryDto.getCode());
-                }
-                Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new ResourceNotFoundException("Category not found: " + categoryDto.getId()));
-                post.getCategories().add(category);
-            }
-        }
-    }
-    
-    private PostContent createContent(Post post, PostContentDTO contentDto, Language language) {
-    	PostContent content = new PostContent();
-    	content.setPost(post);
-    	content.setLanguage(language);
-    	content.setUrlHandle(urlHandleService.generateUniqueHandle(contentDto.getTitle(), language));
-    	content.setTitle(contentDto.getTitle());
-    	content.setContent(contentDto.getContent());
-    	content.setMetaDescription(contentDto.getMetaDescription());
-    	content.setStatus(contentDto.getStatus());
-    	return content;
-    }
-    
-    private PostContent getContentByLanguage(Post post, Language language) {
-    	return post.getContents().stream()
-    			.filter(content -> content.getLanguage() == language)
-    			.findFirst()
-    			.orElse(null);
-    }
-    
-    private void updateContent(PostContent content, PostContentDTO dto) {
-    	content.setTitle(dto.getTitle());
-    	content.setContent(dto.getContent());
-    	content.setMetaDescription(dto.getMetaDescription());
-    	content.setStatus(dto.getStatus());
-    }
 }

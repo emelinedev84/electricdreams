@@ -18,6 +18,8 @@ private static final long serialVersionUID = 1L;
     private Instant createdAt;
     private Instant updatedAt;
     private Long authorId;
+    private PostContentDTO en;
+    private PostContentDTO pt;
     
     // Novos campos para conteúdo específico do idioma
     private String title;
@@ -43,19 +45,22 @@ private static final long serialVersionUID = 1L;
         
         // Se houver algum conteúdo, usa o primeiro para os campos principais
         if (post.getContents() != null && !post.getContents().isEmpty()) {
-	        post.getContents().stream()
-	            .findFirst()
-	            .ifPresent(firstContent -> {
-	                this.title = firstContent.getTitle();
-	                this.urlHandle = firstContent.getUrlHandle();
-	                this.content = firstContent.getContent();
-	                this.metaDescription = firstContent.getMetaDescription();
-	                this.status = firstContent.getStatus();
-	    });
+	        post.getContents().forEach(postContent -> {
+	        	PostContentDTO contentDto = new PostContentDTO(postContent);
+	        	this.contents.add(contentDto);
+	        	if (postContent.getLanguage() == Language.EN) {
+	        		this.en = contentDto;
+	                this.title = postContent.getTitle();
+	                this.urlHandle = postContent.getUrlHandle();
+	                this.content = postContent.getContent();
+	                this.metaDescription = postContent.getMetaDescription();
+	                this.status = postContent.getStatus();
+	        	}
+	        });
+	    }
         
         // Mantém todos os conteúdos na lista contents
         post.getContents().forEach(postContent -> this.contents.add(new PostContentDTO(postContent)));
-        }
 		post.getTags().forEach(x -> this.tags.add(new TagDTO(x)));
 		post.getCategories().forEach(x -> this.categories.add(new CategoryDTO(x)));
     }
@@ -122,8 +127,23 @@ private static final long serialVersionUID = 1L;
         this.authorId = authorId;
     }
 
-    // Novos getters e setters para os campos de conteúdo
-    public String getTitle() {
+    public PostContentDTO getEn() {
+		return en;
+	}
+
+	public void setEn(PostContentDTO en) {
+		this.en = en;
+	}
+
+	public PostContentDTO getPt() {
+		return pt;
+	}
+
+	public void setPt(PostContentDTO pt) {
+		this.pt = pt;
+	}
+
+	public String getTitle() {
         return title;
     }
 

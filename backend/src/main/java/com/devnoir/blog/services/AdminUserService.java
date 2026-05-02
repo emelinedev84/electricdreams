@@ -62,10 +62,15 @@ public class AdminUserService implements UserDetailsService {
  	}
  	
  	@Transactional
- 	public UserDTO insert(UserCreateDTO dto) {
+ 	public UserDTO create(UserCreateDTO dto) {
  		User user = new User();
  		copyDtoToEntity(dto, user);
  		user.setPassword(passwordEncoder.encode(dto.getPassword()));
+ 		if (user.getRoles().isEmpty()) {
+ 			Role role = roleRepository.findByAuthority("ROLE_ADMIN")
+ 					.orElseThrow(() -> new ResourceNotFoundException("Role not found: ROLE_ADMIN"));
+ 			user.getRoles().add(role);
+ 		}
  		user = userRepository.save(user);
  		return new UserDTO(user);
  	}
