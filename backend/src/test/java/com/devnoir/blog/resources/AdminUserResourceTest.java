@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import com.devnoir.blog.dto.UserDTO;
 import com.devnoir.blog.dto.UserProfileDTO;
 import com.devnoir.blog.dto.UserRoleDTO;
 import com.devnoir.blog.dto.UserUpdateDTO;
+import com.devnoir.blog.repositories.UserRepository;
 import com.devnoir.blog.resources.exceptions.ResourceExceptionHandler;
 import com.devnoir.blog.services.AdminUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,6 +46,9 @@ public class AdminUserResourceTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@MockitoBean
+	private UserRepository userRepository;
 
 	@MockitoBean
 	private AdminUserService adminUserService;
@@ -74,6 +79,8 @@ public class AdminUserResourceTest {
 	void insertShouldReturn201AndLocation() throws Exception {
 		UserCreateDTO input = userCreateDTO();
 
+		when(userRepository.findByUsername("admin")).thenReturn(Optional.empty());
+		when(userRepository.findByEmail("admin@email.com")).thenReturn(Optional.empty());
 		when(adminUserService.create(any(UserCreateDTO.class))).thenReturn(userDTO());
 
 		mockMvc.perform(post("/api/admin/users").contextPath("/api").contentType("application/json")
@@ -109,6 +116,9 @@ public class AdminUserResourceTest {
 		UserDTO output = userDTO();
 		output.setUsername("admin-updated");
 		output.setEmail("updated@email.com");
+
+		when(userRepository.findByUsername("admin-updated")).thenReturn(Optional.empty());
+		when(userRepository.findByEmail("updated@email.com")).thenReturn(Optional.empty());
 
 		when(adminUserService.update(eq(1L), any(UserUpdateDTO.class))).thenReturn(output);
 

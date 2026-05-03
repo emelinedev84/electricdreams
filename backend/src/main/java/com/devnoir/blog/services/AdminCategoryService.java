@@ -57,9 +57,9 @@ public class AdminCategoryService {
 	    	newCode = SlugifyHelper.toSlug(dto.getCode());
 	    }
 	    
-	    Optional<Category> currentCode = categoryRepository.findByCode(category.getCode());
-	    if (currentCode.isPresent() && !currentCode.get().getId().equals(id)) {
-	    	throw new BusinessException("Category code already exists: " + category.getCode());
+	    Optional<Category> categoryWithSameCode = categoryRepository.findByCode(newCode);
+	    if (categoryWithSameCode.isPresent() && !categoryWithSameCode.get().getId().equals(id)) {
+	    	throw new BusinessException("Category code already exists: " + newCode);
 	    }
 	    
 	    category.setCode(newCode);

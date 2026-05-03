@@ -15,7 +15,7 @@ import com.devnoir.blog.entities.User;
 import com.devnoir.blog.enums.Language;
 import com.devnoir.blog.enums.PostContentStatus;
 
-@DataJpaTest
+@DataJpaTest(properties = {"spring.jpa.properties.hibernate.hbm2ddl.import_files="})
 public class PostContentRepositoryTest {
 
 	@Autowired

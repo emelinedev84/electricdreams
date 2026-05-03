@@ -10,7 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import com.devnoir.blog.entities.Category;
 
-@DataJpaTest
+@DataJpaTest(properties = {"spring.jpa.properties.hibernate.hbm2ddl.import_files="})
 public class CategoryRepositoryTest {
 
 	@Autowired

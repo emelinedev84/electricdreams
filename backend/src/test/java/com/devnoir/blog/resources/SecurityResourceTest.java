@@ -11,11 +11,15 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.h2.H2ConsoleProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,7 +33,7 @@ import com.devnoir.blog.services.BlogService;
 
 @WebMvcTest({ AdminCategoryResource.class, BlogResource.class })
 @AutoConfigureMockMvc
-@Import({ ResourceServerConfig.class, ResourceExceptionHandler.class })
+@Import({ ResourceServerConfig.class, ResourceExceptionHandler.class, SecurityResourceTest.H2ConsoleTestConfig.class})
 @TestPropertySource(properties = "cors.origins=http://localhost:3000")
 public class SecurityResourceTest {
 
@@ -41,6 +45,20 @@ public class SecurityResourceTest {
 
 	@MockitoBean
 	private BlogService blogService;
+	
+	@MockitoBean
+	private JwtDecoder jwtDecoder;
+	
+	@TestConfiguration
+	static class H2ConsoleTestConfig {
+
+	    @Bean
+	    H2ConsoleProperties h2ConsoleProperties() {
+	        H2ConsoleProperties properties = new H2ConsoleProperties();
+	        properties.setPath("/h2-console");
+	        return properties;
+	    }
+	}
 
 	@Test
 	void publicRoutesShouldBeAccessibleWithoutAuthentication() throws Exception {
@@ -69,3 +87,5 @@ public class SecurityResourceTest {
 				.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_USER")))).andExpect(status().isForbidden());
 	}
 }
+
+

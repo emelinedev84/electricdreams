@@ -13,7 +13,7 @@ import com.devnoir.blog.entities.Role;
 import com.devnoir.blog.entities.User;
 import com.devnoir.blog.projections.UserDetailsProjection;
 
-@DataJpaTest
+@DataJpaTest(properties = {"spring.jpa.properties.hibernate.hbm2ddl.import_files="})
 public class UserRepositoryTest {
 
 	@Autowired

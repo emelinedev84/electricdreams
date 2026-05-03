@@ -104,9 +104,9 @@ public class AdminUserService implements UserDetailsService {
     	
     	if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
     		Optional<User> userWithSameEmail = userRepository.findByEmail(dto.getEmail());
-    		if (userWithSameEmail.isPresent() && userWithSameEmail.get().getId().equals(id)) {
-    			throw new BusinessException("Email already exists");
-    		}
+    	    if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId().equals(id)) {
+    	        throw new BusinessException("Email already exists");
+    	    }
     		user.setEmail(dto.getEmail());
     	}
         user.setFirstName(dto.getFirstName());
