@@ -180,7 +180,7 @@ public class AdminPostService {
     }
     
     private void updateContent(PostContent content, PostContentDTO dto) {
-    	if (content.getTitle() == dto.getTitle()) {
+    	if (content.getTitle() != dto.getTitle()) {
     		content.setUrlHandle(urlHandleService.generateUniqueHandleForUpdate(dto.getTitle(), content.getLanguage(), content.getId()));
     	}
     	
